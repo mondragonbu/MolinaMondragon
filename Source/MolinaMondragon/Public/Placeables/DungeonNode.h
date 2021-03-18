@@ -7,6 +7,13 @@
 #include "DungeonNode.generated.h"
 
 
+UENUM(BlueprintType)
+enum class  NodeType : uint8
+{
+	Ground     UMETA(DisplayName = "Ground"),
+	Wall      UMETA(DisplayName = "Wall"),
+
+};
 UCLASS()
 class MOLINAMONDRAGON_API ADungeonNode : public AActor
 {
@@ -19,6 +26,10 @@ public:
 		class USceneComponent* root_;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 		class UStaticMeshComponent* Mesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+		NodeType type_;
+private:
+	class UMaterialInstanceDynamic* MI_;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,5 +37,6 @@ protected:
 public:	
 	UFUNCTION()
 	void SetActive(bool active);
-
+	UFUNCTION()
+	void SetColor(FLinearColor color);
 };

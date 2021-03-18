@@ -20,7 +20,9 @@ ADungeonNode::ADungeonNode()
 void ADungeonNode::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	MI_ = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(0), this);
+	MI_->SetVectorParameterValue(TEXT("Color"), FLinearColor::Black);
+	Mesh->SetMaterial(0, MI_);
 }
 
 void ADungeonNode::SetActive(bool active)
@@ -34,5 +36,11 @@ void ADungeonNode::SetActive(bool active)
 	// Stops the Actor from ticking
 	//SetActorTickEnabled(false);
 
+}
+
+void ADungeonNode::SetColor(FLinearColor color)
+{
+	MI_->SetVectorParameterValue(TEXT("Color"), color);
+	//UE_LOG(LogTemp, Warning, TEXT("SET NODE COLOR"));
 }
 
