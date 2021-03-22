@@ -51,7 +51,7 @@ void ADungeonGameMode::GenerateCave()
 			int type = FMath::RandRange(0, 100);
 			FLinearColor color;
 			NodeType typeNode;
-			if (type < 45) {
+			if (type < 40) {
 				color = groundColor0_;
 				typeNode = NodeType::Wall;
 				grid_.Add(NodeType::Wall);
@@ -80,124 +80,152 @@ void ADungeonGameMode::GenerateCave()
 void ADungeonGameMode::IterateCave()
 {
 		TArray<NodeType> nextGrid;
+
 		UE_LOG(LogTemp, Warning, TEXT("--------begin iteration-----"));
 		for (int iY = 0; iY < gridSize_.Y; iY++)
 		{
+
 			for (int iX = 0; iX < gridSize_.X; iX++)
 			{
-				uint8  neighbors = 0;
-
-
+				int  neighbors = 0;
+				//self
+				int selfidx = iY * gridSize_.X + iX;
+				if (grid_[selfidx] == NodeType::Wall) {
+					neighbors++;
+				}
+				
 				//top left
-				if (iY == 0 || iX == 0) {
-					UE_LOG(LogTemp, Warning, TEXT("top left"));
+				if (iX == 0 || iY == 0) {
 					neighbors++;
+
 				}
 				else {
-					uint8 index = iY * gridSize_.X + iX;
-					index -= (gridSize_.X + 1);
+					int index = iY * gridSize_.X + iX;
+					index -=  gridSize_.X;
+					index -= 1;
 					if (grid_[index] == NodeType::Wall)
 						neighbors++;
+
 				}
-				//top
-				if (iY == 0) {
-					UE_LOG(LogTemp, Warning, TEXT("top"));
-					neighbors++;
-				}
-				else {
-					uint8 index = iY * gridSize_.X + iX;
-					index -= gridSize_.X;
-					if (grid_[index] == NodeType::Wall)
-						neighbors++;
-				}
+
 				//top right
 				if (iY == 0 || iX == gridSize_.X - 1) {
-					UE_LOG(LogTemp, Warning, TEXT("top right"));
+					//UE_LOG(LogTemp, Warning, TEXT("top right"));
 					neighbors++;
+
 				}
 				else {
-					uint8 index = iY * gridSize_.X + iX;
+					int index = iY * gridSize_.X + iX;
 					index -= (gridSize_.X - 1);
 					if (grid_[index] == NodeType::Wall)
 						neighbors++;
+
 				}
+				//top
+				if (iY == 0) {
+					neighbors++;
+
+				}
+				else {
+					int index = iY * gridSize_.X + iX;
+					index -= gridSize_.X;
+					if (grid_[index] == NodeType::Wall)
+						neighbors++;
+
+				}
+
+				
 				//left
 				if (iX == 0) {
-					UE_LOG(LogTemp, Warning, TEXT("left"));
+					//UE_LOG(LogTemp, Warning, TEXT("left"));
 					neighbors++;
 				}
 				else {
-					uint8 index = iY * gridSize_.X + iX;
+					int index = iY * gridSize_.X + iX;
 					index -= 1;
 					if (grid_[index] == NodeType::Wall)
 						neighbors++;
 				}
-				//right
-				if (iX == gridSize_.X - 1) {
-					UE_LOG(LogTemp, Warning, TEXT("right"));
-					neighbors++;
-				}
-				else {
-					uint8 index = iY * gridSize_.X + iX;
-					index += 1;
-					if (grid_[index] == NodeType::Wall)
-						neighbors++;
-				}
+
 				//down left
 				if (iY == gridSize_.Y - 1 || iX == 0) {
-					UE_LOG(LogTemp, Warning, TEXT("down left"));
+					//UE_LOG(LogTemp, Warning, TEXT("down left"));
 					neighbors++;
 				}
 				else {
-					uint8 index = iY * gridSize_.X + iX;
+					int index = iY * gridSize_.X + iX;
 					index += gridSize_.X - 1;
 					if (grid_[index] == NodeType::Wall)
 						neighbors++;
 				}
 
-				//down 
-				if (iY == gridSize_.Y - 1) {
-					UE_LOG(LogTemp, Warning, TEXT("down"));
-					neighbors++;
-				}
-				else {
-					uint8 index = iY * gridSize_.X + iX;
-					index += gridSize_.X;
-					if (grid_[index] == NodeType::Wall)
-						neighbors++;
-				}
 				//down right
 				if (iY == gridSize_.Y - 1 || iX == gridSize_.X - 1) {
-					UE_LOG(LogTemp, Warning, TEXT("down right"));
+					//UE_LOG(LogTemp, Warning, TEXT("down right"));
 					neighbors++;
 				}
 				else {
-					uint8 index = iY * gridSize_.X + iX;
+					int index = iY * gridSize_.X + iX;
 					index += gridSize_.X + 1;
 					if (grid_[index] == NodeType::Wall)
 						neighbors++;
 				}
-				//self
-				if (grid_[iY * gridSize_.X + iX] == NodeType::Wall) {
+				//right
+				if (iX == gridSize_.X - 1) {
+					//UE_LOG(LogTemp, Warning, TEXT("right"));
 					neighbors++;
 				}
+				else {
+					int index = iY * gridSize_.X + iX;
+					index += 1;
+					if (grid_[index] == NodeType::Wall)
+						neighbors++;
+				}
+
+
+				//down 
+				if (iY == gridSize_.Y - 1) {
+					//UE_LOG(LogTemp, Warning, TEXT("down"));
+					neighbors++;
+				}
+				else {
+					int index = iY * gridSize_.X + iX;
+					index += gridSize_.X;
+					if (grid_[index] == NodeType::Wall)
+						neighbors++;
+				}
+				
+				
+
 				if (neighbors >= neighborsRule)
 					nextGrid.Add(NodeType::Wall);
 				else
 					nextGrid.Add(NodeType::Ground);
 			}
 		}
-
+			
 		grid_ = nextGrid;
 		//TODO CREATE FUNCTION
-		for (int i = 0; i < gridSize_.X * gridSize_.Y; i++)
+		for (int iY = 0; iY < gridSize_.Y; iY++)
+		{
+			for (int iX = 0; iX < gridSize_.X; iX++)
+			{
+				groundActivePool_[iY * gridSize_.X + iX]->type_ = grid_[iY * gridSize_.X + iX];
+				if (groundActivePool_[iY * gridSize_.X + iX]->type_ == NodeType::Wall)
+					groundActivePool_[iY * gridSize_.X + iX]->SetColor(groundColor0_);
+				else
+					groundActivePool_[iY * gridSize_.X + iX]->SetColor(groundColor1_);
+			}
+
+		}
+		/*for (int i = 0; i < gridSize_.X * gridSize_.Y; i++)
 		{
 			groundActivePool_[i]->type_ = grid_[i];
 			if (groundActivePool_[i]->type_ == NodeType::Wall)
 				groundActivePool_[i]->SetColor(groundColor0_);
 			else
 				groundActivePool_[i]->SetColor(groundColor1_);
-		}
+		}*/
 }
 
 void ADungeonGameMode::CreatePool()

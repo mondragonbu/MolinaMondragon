@@ -26,8 +26,9 @@ public:
 		class USceneComponent* root_;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
 		class UStaticMeshComponent* Mesh;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Setup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		NodeType type_;
+	
 private:
 	class UMaterialInstanceDynamic* MI_;
 protected:
