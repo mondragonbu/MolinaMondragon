@@ -62,7 +62,7 @@ void ADungeonGameMode::GenerateCave()
 				grid_.Add(NodeType::Ground);
 			}
 				
-			GenerateNode(FVector(100 * i, 100 * j, 0.f), color, typeNode);
+			GenerateNode(FVector(groundTileWidth_ * i, groundTileHeight_ * j, 0.f), color, typeNode);
 		}
 	}
 	//TODO CREATE FUNCTION
@@ -84,7 +84,6 @@ void ADungeonGameMode::IterateCave()
 		UE_LOG(LogTemp, Warning, TEXT("--------begin iteration-----"));
 		for (int iY = 0; iY < gridSize_.Y; iY++)
 		{
-
 			for (int iX = 0; iX < gridSize_.X; iX++)
 			{
 				int  neighbors = 0;
@@ -256,7 +255,7 @@ void ADungeonGameMode::GenerateLevel() {
 				color = groundColor0_;
 			else
 				color = groundColor1_;
-			GenerateNode(FVector(100*i, 100*j,0.f), color, NodeType::Ground);
+			GenerateNode(FVector(groundTileWidth_*i, groundTileHeight_*j,0.f), color, NodeType::Ground);
 		}
 	}
 

@@ -31,6 +31,10 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 		FLinearColor groundColor0_;
 	UPROPERTY(EditDefaultsOnly, Category = "Generation")
 		FLinearColor groundColor1_;
+  UPROPERTY(EditDefaultsOnly, Category = "Generation")
+    float groundTileHeight_ = 100.0f;
+  UPROPERTY(EditDefaultsOnly, Category = "Generation")
+    float groundTileWidth_ = 100.0f;
 	UPROPERTY(EditDefaultsOnly, Category = "Generation")
 	GenerationType GenerationType_;
 	UPROPERTY(EditDefaultsOnly, Category = "Generation")
@@ -39,10 +43,14 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	uint8 iterations_ = 3;
 	UPROPERTY(EditDefaultsOnly, Category = "Cave Generation")
 	uint8 neighborsRule = 4;
+
+
+
+  TArray<NodeType> grid_;
 	private:
 		TArray<ADungeonNode*> groundEnablePool_;
 		TArray<ADungeonNode*> groundActivePool_;
-		TArray<NodeType> grid_;
+		
 	public:
 		UFUNCTION()
 		void GenerateLevel();
