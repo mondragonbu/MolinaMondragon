@@ -15,6 +15,34 @@ AEnemy::AEnemy()
   
 }
 
+void AEnemy::MoveUp()
+{
+  GridMovementComponent_->MoveUp();
+  FVector worldPos = GridMovementComponent_->GetWorldPosition();
+  SetActorLocation(worldPos);
+}
+
+void AEnemy::MoveDown()
+{
+  GridMovementComponent_->MoveDown();
+  FVector worldPos = GridMovementComponent_->GetWorldPosition();
+  SetActorLocation(worldPos);
+}
+
+void AEnemy::MoveLeft()
+{
+  GridMovementComponent_->MoveLeft();
+  FVector worldPos = GridMovementComponent_->GetWorldPosition();
+  SetActorLocation(worldPos);
+}
+
+void AEnemy::MoveRight()
+{
+  GridMovementComponent_->MoveRight();
+  FVector worldPos = GridMovementComponent_->GetWorldPosition();
+  SetActorLocation(worldPos);
+}
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
