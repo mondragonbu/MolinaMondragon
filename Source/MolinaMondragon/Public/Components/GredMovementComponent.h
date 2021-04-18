@@ -42,4 +42,10 @@ public:
     void MoveRight();
   UFUNCTION()
     void MoveDown();
+  UFUNCTION()
+      int RandomWalkableNode();
+  UFUNCTION()
+      int ManhattanDistance(int origin, int dest);
+  UFUNCTION()
+      FVector Index2RowCol(int idx);
 };

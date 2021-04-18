@@ -3,6 +3,9 @@
 
 #include "Player/MyPlayer.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Enemies/Enemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameModes/DungeonGameMode.h"
 
 #include "Components/GredMovementComponent.h"
 // Sets default values
@@ -21,6 +24,13 @@ void AMyPlayer::BeginPlay()
 {
 	Super::BeginPlay();
   
+  GridMovementComponent_->GridPosition_ = GridMovementComponent_->RandomWalkableNode();
+  FVector worldPos = GridMovementComponent_->GetWorldPosition();
+  SetActorLocation(worldPos);
+
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+  GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
 }
 
 void AMyPlayer::MoveUp()

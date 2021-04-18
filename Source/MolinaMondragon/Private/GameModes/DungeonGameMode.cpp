@@ -6,6 +6,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Math/UnrealMathUtility.h"
 
+
 void ADungeonGameMode::BeginPlay() {
 
 	CreatePool();
@@ -19,7 +20,11 @@ void ADungeonGameMode::BeginPlay() {
 		break;
 
 	}
-	
+
+	for (int i = 0; i < iterations_; i++) {
+			IterateCave();
+	}
+
 }
 
 void ADungeonGameMode::GenerateNode(FVector position, FLinearColor color, NodeType type)

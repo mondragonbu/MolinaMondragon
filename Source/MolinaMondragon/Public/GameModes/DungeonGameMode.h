@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
 #include "Placeables/DungeonNode.h"
+#include "Enemies/Enemy.h"
 #include "DungeonGameMode.generated.h"
 
 /**
@@ -44,7 +45,9 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	UPROPERTY(EditDefaultsOnly, Category = "Cave Generation")
 	uint8 neighborsRule = 4;
 
-
+	//ENEMY
+  UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+      TSubclassOf<AEnemy> Enemy_;
 
   TArray<NodeType> grid_;
 	private:

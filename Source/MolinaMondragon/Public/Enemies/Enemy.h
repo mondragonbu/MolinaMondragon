@@ -6,6 +6,33 @@
 #include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct FPathInfo
+{
+    GENERATED_USTRUCT_BODY();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        float positionFromTheStart = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        float distanceToTheEnd = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        float positionPlusDistance = 0.0f;
+};
+
+UENUM(BlueprintType)
+enum class  MovementsEnemy : uint8
+{
+    None     UMETA(DisplayName = "None"),
+    Right      UMETA(DisplayName = "Right"),
+    Up      UMETA(DisplayName = "Up"),
+    Left      UMETA(DisplayName = "Left"),
+    Down      UMETA(DisplayName = "Down"),
+};
+
+class AEnemy;
 UCLASS()
 class MOLINAMONDRAGON_API AEnemy : public APawn
 {
@@ -27,9 +54,22 @@ public:
     void MoveLeft();
   UFUNCTION()
     void MoveRight();
+
+  TArray<FPathInfo> pathInfo_;
+  TArray<MovementsEnemy> movementEnemy_;
+  
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+  void PathFinding(int actualPosition, int originPosition);
+  void ExecuteMovement();
+
+  int actualPositionPath;
+  int originPositionPath;
+
+  int loopInPath_;
+  float timer;
 
 public:	
 	// Called every frame
