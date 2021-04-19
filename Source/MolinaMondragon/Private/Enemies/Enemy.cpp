@@ -61,94 +61,109 @@ void AEnemy::BeginPlay()
   AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
   originPositionPath = player->GridMovementComponent_->GridPosition_;
 
-  loopInPath_ = 1;
-  while (actualPositionPath != originPositionPath) {
-      PathFinding(actualPositionPath, originPositionPath);
-  }
+  PathFinding(actualPositionPath, originPositionPath);
 }
 
 void AEnemy::PathFinding(int actualPosition, int originPosition)
 {
     ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
-    int actualDirection = -1;
-    int actualMinDist = 100;
         
-    //RIGHT
-    if (gameMode->grid_[actualPosition + 1] != NodeType::Wall) {
-        FPathInfo enemyLoopRight;
+    loopInPath_ = 1;
 
-        enemyLoopRight.positionFromTheStart = loopInPath_;
-        enemyLoopRight.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(actualPosition + 1, originPosition);
-        enemyLoopRight.positionPlusDistance = enemyLoopRight.positionFromTheStart + enemyLoopRight.distanceToTheEnd;
+    while (actualPosition != originPosition) {
 
-        pathInfo_.Add(enemyLoopRight);
-        if (enemyLoopRight.positionPlusDistance < actualMinDist) {
-            actualDirection = 1;
-            actualMinDist = enemyLoopRight.positionPlusDistance;
+        int actualDirection = -1;
+        int actualMinDist = 100;
+
+        //RIGHT
+        int rightPosition = actualPosition + 1;
+        if (rightPosition > 0 && rightPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+            if (gameMode->grid_[rightPosition] != NodeType::Wall) {
+                FPathInfo enemyLoopRight;
+
+                enemyLoopRight.positionFromTheStart = loopInPath_;
+                enemyLoopRight.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(rightPosition, originPosition);
+                enemyLoopRight.positionPlusDistance = enemyLoopRight.positionFromTheStart + enemyLoopRight.distanceToTheEnd;
+
+                pathInfo_.Add(enemyLoopRight);
+                if (enemyLoopRight.positionPlusDistance < actualMinDist) {
+                    actualDirection = 1;
+                    actualMinDist = enemyLoopRight.positionPlusDistance;
+                }
+            }
+        }       
+
+        //UP
+        int upPosition = actualPosition - gameMode->gridSize_.X;
+        if (upPosition > 0 && upPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+            if (gameMode->grid_[upPosition] != NodeType::Wall) {
+                FPathInfo enemyLoopUp;
+                enemyLoopUp.positionFromTheStart = loopInPath_;
+                enemyLoopUp.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(upPosition, originPosition);
+                enemyLoopUp.positionPlusDistance = enemyLoopUp.positionFromTheStart + enemyLoopUp.distanceToTheEnd;
+                pathInfo_.Add(enemyLoopUp);
+                if (enemyLoopUp.positionPlusDistance < actualMinDist) {
+                    actualDirection = 2;
+                    actualMinDist = enemyLoopUp.positionPlusDistance;
+                }
+            }
         }
-    }
+        
 
-    //UP
-    if (gameMode->grid_[actualPosition - gameMode->gridSize_.X] != NodeType::Wall) {
-        FPathInfo enemyLoopUp;
-        enemyLoopUp.positionFromTheStart = loopInPath_;
-        enemyLoopUp.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(actualPosition - gameMode->gridSize_.X, originPosition);
-        enemyLoopUp.positionPlusDistance = enemyLoopUp.positionFromTheStart + enemyLoopUp.distanceToTheEnd;
-        pathInfo_.Add(enemyLoopUp);
-        if (enemyLoopUp.positionPlusDistance < actualMinDist) {
-            actualDirection = 2;
-            actualMinDist = enemyLoopUp.positionPlusDistance;
+        //LEFT
+        int leftPosition = actualPosition - 1;
+        if (leftPosition > 0 && leftPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+            if (gameMode->grid_[leftPosition] != NodeType::Wall) {
+                FPathInfo enemyLoopLeft;
+                enemyLoopLeft.positionFromTheStart = loopInPath_;
+                enemyLoopLeft.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(leftPosition, originPosition);
+                enemyLoopLeft.positionPlusDistance = enemyLoopLeft.positionFromTheStart + enemyLoopLeft.distanceToTheEnd;
+                pathInfo_.Add(enemyLoopLeft);
+                if (enemyLoopLeft.positionPlusDistance < actualMinDist) {
+                    actualDirection = 3;
+                    actualMinDist = enemyLoopLeft.positionPlusDistance;
+                }
+            }
+        }     
+
+        //DOWN
+        int downPosition = actualPosition + gameMode->gridSize_.X;
+        if (downPosition > 0 && downPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {          
+            if (gameMode->grid_[downPosition] != NodeType::Wall) {
+                FPathInfo enemyLoopDown;
+                enemyLoopDown.positionFromTheStart = loopInPath_;
+                enemyLoopDown.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(downPosition, originPosition);
+                enemyLoopDown.positionPlusDistance = enemyLoopDown.positionFromTheStart + enemyLoopDown.distanceToTheEnd;
+                pathInfo_.Add(enemyLoopDown);
+                if (enemyLoopDown.positionPlusDistance < actualMinDist) {
+                    actualDirection = 4;
+                    actualMinDist = enemyLoopDown.positionPlusDistance;
+                }
+            }
+        } 
+        
+
+        switch (actualDirection) {
+        case 1:
+            actualPosition = actualPosition + 1;
+            movementEnemy_.Add(MovementsEnemy::Right);
+            break;
+        case 2:
+            actualPosition = actualPosition - gameMode->gridSize_.X;
+            movementEnemy_.Add(MovementsEnemy::Up);
+            break;
+        case 3:
+            actualPosition = actualPosition - 1;
+            movementEnemy_.Add(MovementsEnemy::Left);
+            break;
+        case 4:
+            actualPosition = actualPosition + gameMode->gridSize_.X;
+            movementEnemy_.Add(MovementsEnemy::Down);
+            break;
         }
-    }
 
-    //LEFT
-    if (gameMode->grid_[actualPosition - 1] != NodeType::Wall) {
-        FPathInfo enemyLoopLeft;
-        enemyLoopLeft.positionFromTheStart = loopInPath_;
-        enemyLoopLeft.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(actualPosition - 1, originPosition);
-        enemyLoopLeft.positionPlusDistance = enemyLoopLeft.positionFromTheStart + enemyLoopLeft.distanceToTheEnd;
-        pathInfo_.Add(enemyLoopLeft);
-        if (enemyLoopLeft.positionPlusDistance < actualMinDist) {
-            actualDirection = 3;
-            actualMinDist = enemyLoopLeft.positionPlusDistance;
-        }
+        loopInPath_++;
     }
-
-    //DOWN
-    if (gameMode->grid_[actualPosition + gameMode->gridSize_.X] != NodeType::Wall) {
-        FPathInfo enemyLoopDown;
-        enemyLoopDown.positionFromTheStart = loopInPath_;
-        enemyLoopDown.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(actualPosition + gameMode->gridSize_.X, originPosition);
-        enemyLoopDown.positionPlusDistance = enemyLoopDown.positionFromTheStart + enemyLoopDown.distanceToTheEnd;
-        pathInfo_.Add(enemyLoopDown);
-        if (enemyLoopDown.positionPlusDistance < actualMinDist) {
-            actualDirection = 4;
-            actualMinDist = enemyLoopDown.positionPlusDistance;
-        }
-    }
-
-    switch (actualDirection) {
-    case 1: 
-        actualPositionPath = actualPositionPath + 1;
-        movementEnemy_.Add(MovementsEnemy::Right); 
-        break;
-    case 2: 
-        actualPositionPath = actualPositionPath - gameMode->gridSize_.X;
-        movementEnemy_.Add(MovementsEnemy::Up); 
-        break;
-    case 3: 
-        actualPositionPath = actualPositionPath - 1;
-        movementEnemy_.Add(MovementsEnemy::Left); 
-        break;
-    case 4: 
-        actualPositionPath = actualPositionPath + gameMode->gridSize_.X;
-        movementEnemy_.Add(MovementsEnemy::Down); 
-        break;
-    default: break;
-    }
-
-    loopInPath_++;
         
     UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
 }
@@ -178,8 +193,6 @@ void AEnemy::ExecuteMovement()
             actualPositionPath = GridMovementComponent_->GridPosition_;
             movementEnemy_.RemoveAt(0);
             break;
-        default:
-            break;
         }
     }
     else {
@@ -192,7 +205,7 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
   timer += DeltaTime;
-  if (timer >= 1.0f) { 
+  if (timer >= 0.66f) { 
       ExecuteMovement();
       UE_LOG(LogTemp, Warning, TEXT("-----TICK ENEMY-----"));
       timer = 0.0f;   
