@@ -39,6 +39,7 @@ void AMyPlayer::MoveUp()
   GridMovementComponent_->MoveUp();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::MoveDown()
@@ -47,6 +48,7 @@ void AMyPlayer::MoveDown()
   GridMovementComponent_->MoveDown();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::MoveLeft()
@@ -55,6 +57,7 @@ void AMyPlayer::MoveLeft()
   GridMovementComponent_->MoveLeft();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::MoveRight()
@@ -63,6 +66,19 @@ void AMyPlayer::MoveRight()
   GridMovementComponent_->MoveRight();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  //ActivePathfindingEnemies();
+}
+
+void AMyPlayer::ActivePathfindingEnemies()
+{
+    TArray<AActor*> Enemies;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(TEXT("Enemy")), Enemies);
+
+    for (AActor* a : Enemies)
+    {
+        AEnemy* e = Cast<AEnemy>(a);
+        e->ExecuteInternalPathfinding();
+    }
 }
 
 // Called every frame

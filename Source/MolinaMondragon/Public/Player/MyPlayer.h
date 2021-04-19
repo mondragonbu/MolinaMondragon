@@ -32,6 +32,8 @@ private:
     void MoveLeft();
   UFUNCTION()
     void MoveRight();
+  UFUNCTION()
+    void ActivePathfindingEnemies();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

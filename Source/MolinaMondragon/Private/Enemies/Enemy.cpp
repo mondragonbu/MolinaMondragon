@@ -48,6 +48,16 @@ void AEnemy::MoveRight()
   SetActorLocation(worldPos);
 }
 
+void AEnemy::ExecuteInternalPathfinding()
+{
+    actualPositionPath = GridMovementComponent_->GridPosition_;
+
+    AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
+    originPositionPath = player->GridMovementComponent_->GridPosition_;
+
+    PathFinding(actualPositionPath, originPositionPath);
+}
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
@@ -56,12 +66,7 @@ void AEnemy::BeginPlay()
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
 
-  actualPositionPath = GridMovementComponent_->GridPosition_;
-
-  AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
-  originPositionPath = player->GridMovementComponent_->GridPosition_;
-
-  PathFinding(actualPositionPath, originPositionPath);
+  ExecuteInternalPathfinding();
 }
 
 void AEnemy::PathFinding(int actualPosition, int originPosition)
@@ -69,6 +74,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
     ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
         
     loopInPath_ = 1;
+    movementEnemy_.Empty();
 
     while (actualPosition != originPosition) {
 

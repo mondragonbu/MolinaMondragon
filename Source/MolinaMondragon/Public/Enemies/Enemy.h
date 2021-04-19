@@ -54,6 +54,8 @@ public:
     void MoveLeft();
   UFUNCTION()
     void MoveRight();
+  UFUNCTION()
+    void ExecuteInternalPathfinding();
 
   TArray<FPathInfo> pathInfo_;
   TArray<MovementsEnemy> movementEnemy_;
