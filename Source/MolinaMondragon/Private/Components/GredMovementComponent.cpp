@@ -68,12 +68,15 @@ int UGredMovementComponent::RandomWalkableNode()
 {  
     int sizegrid = GM_->gridSize_.X * GM_->gridSize_.Y;
 
-    while(true){
-        int randomNode = FMath::RandRange(0, sizegrid);
-        if (GM_->grid_[randomNode] == NodeType::Ground) {
-            return randomNode;
+    bool nodeFind = false;
+    int randomNode = 0;
+    while(!nodeFind){
+        randomNode = FMath::RandRange(0, sizegrid - 1);
+        if (grid_[randomNode] == NodeType::Ground) {
+            nodeFind = true;
         }
     }
+    return randomNode;
 }
 
 int UGredMovementComponent::ManhattanDistance(int origin, int dest)

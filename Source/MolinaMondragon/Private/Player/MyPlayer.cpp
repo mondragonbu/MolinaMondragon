@@ -30,8 +30,9 @@ void AMyPlayer::BeginPlay()
 
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-  GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
-  GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
+  for (int i = 0; i < gamemode->numberEnemy_; i++) {
+      GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
+  }
 }
 
 void AMyPlayer::MoveUp()

@@ -48,6 +48,9 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	//ENEMY
   UPROPERTY(EditDefaultsOnly, Category = "Enemy")
       TSubclassOf<AEnemy> Enemy_;
+  UPROPERTY(EditDefaultsOnly, Category = "Enemy")
+      uint8 numberEnemy_ = 1;
+
 
   TArray<NodeType> grid_;
 	private:

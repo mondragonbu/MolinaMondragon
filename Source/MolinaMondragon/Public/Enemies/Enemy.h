@@ -45,6 +45,8 @@ public:
   class USkeletalMeshComponent* Mesh_;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
+  UPROPERTY(EditDefaultsOnly, Category = "Pathfinding")
+      uint8 maxLoopsPathfinding_ = 1;
 
   UFUNCTION()
     void MoveUp();

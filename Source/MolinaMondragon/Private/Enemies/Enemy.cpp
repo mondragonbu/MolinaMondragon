@@ -65,6 +65,8 @@ void AEnemy::BeginPlay()
   GridMovementComponent_->GridPosition_ = GridMovementComponent_->RandomWalkableNode();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  gameMode->grid_[GridMovementComponent_->GridPosition_] = NodeType::Ocupped;
 
   ExecuteInternalPathfinding();
 }
@@ -91,7 +93,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                 enemyLoopRight.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(rightPosition, originPosition);
                 enemyLoopRight.positionPlusDistance = enemyLoopRight.positionFromTheStart + enemyLoopRight.distanceToTheEnd;
 
-                pathInfo_.Add(enemyLoopRight);
+                //pathInfo_.Add(enemyLoopRight);
                 if (enemyLoopRight.positionPlusDistance < actualMinDist) {
                     actualDirection = 1;
                     actualMinDist = enemyLoopRight.positionPlusDistance;
@@ -107,7 +109,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                 enemyLoopUp.positionFromTheStart = loopInPath_;
                 enemyLoopUp.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(upPosition, originPosition);
                 enemyLoopUp.positionPlusDistance = enemyLoopUp.positionFromTheStart + enemyLoopUp.distanceToTheEnd;
-                pathInfo_.Add(enemyLoopUp);
+                //pathInfo_.Add(enemyLoopUp);
                 if (enemyLoopUp.positionPlusDistance < actualMinDist) {
                     actualDirection = 2;
                     actualMinDist = enemyLoopUp.positionPlusDistance;
@@ -124,7 +126,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                 enemyLoopLeft.positionFromTheStart = loopInPath_;
                 enemyLoopLeft.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(leftPosition, originPosition);
                 enemyLoopLeft.positionPlusDistance = enemyLoopLeft.positionFromTheStart + enemyLoopLeft.distanceToTheEnd;
-                pathInfo_.Add(enemyLoopLeft);
+                //pathInfo_.Add(enemyLoopLeft);
                 if (enemyLoopLeft.positionPlusDistance < actualMinDist) {
                     actualDirection = 3;
                     actualMinDist = enemyLoopLeft.positionPlusDistance;
@@ -140,7 +142,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                 enemyLoopDown.positionFromTheStart = loopInPath_;
                 enemyLoopDown.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(downPosition, originPosition);
                 enemyLoopDown.positionPlusDistance = enemyLoopDown.positionFromTheStart + enemyLoopDown.distanceToTheEnd;
-                pathInfo_.Add(enemyLoopDown);
+                //pathInfo_.Add(enemyLoopDown);
                 if (enemyLoopDown.positionPlusDistance < actualMinDist) {
                     actualDirection = 4;
                     actualMinDist = enemyLoopDown.positionPlusDistance;
@@ -169,6 +171,9 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         }
 
         loopInPath_++;
+        if (loopInPath_ >= maxLoopsPathfinding_) {
+            actualPosition = originPosition;
+        }
     }
         
     UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
@@ -211,8 +216,8 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
   timer += DeltaTime;
-  if (timer >= 0.66f) { 
-      PathFinding(actualPositionPath, originPositionPath);
+  if (timer >= 1.0f) { 
+      ExecuteInternalPathfinding();
       ExecuteMovement();
       UE_LOG(LogTemp, Warning, TEXT("-----TICK ENEMY-----"));
       timer = 0.0f;   
