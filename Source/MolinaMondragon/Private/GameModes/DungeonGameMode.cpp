@@ -47,7 +47,8 @@ void ADungeonGameMode::GenerateNode(FVector position, FLinearColor color, NodeTy
 }
 void ADungeonGameMode::GenerateCave()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Generate cave"));
+		FMath::RandInit(69);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Generate cave"));
 
 	for (int j = 0; j < gridSize_.Y; j++)
 	{
