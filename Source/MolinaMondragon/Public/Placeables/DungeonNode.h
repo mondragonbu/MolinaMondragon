@@ -12,6 +12,7 @@ enum class  NodeType : uint8
 {
 	Ground     UMETA(DisplayName = "Ground"),
 	Wall      UMETA(DisplayName = "Wall"),
+	Ocupped		UMETA(DisplayName = "Ocupped")
 
 };
 UCLASS()

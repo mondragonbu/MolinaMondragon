@@ -31,6 +31,7 @@ void AMyPlayer::BeginPlay()
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
   GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
+  GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
 }
 
 void AMyPlayer::MoveUp()
@@ -39,7 +40,6 @@ void AMyPlayer::MoveUp()
   GridMovementComponent_->MoveUp();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
-  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::MoveDown()
@@ -48,7 +48,6 @@ void AMyPlayer::MoveDown()
   GridMovementComponent_->MoveDown();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
-  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::MoveLeft()
@@ -57,7 +56,6 @@ void AMyPlayer::MoveLeft()
   GridMovementComponent_->MoveLeft();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
-  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::MoveRight()
@@ -66,7 +64,6 @@ void AMyPlayer::MoveRight()
   GridMovementComponent_->MoveRight();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
-  //ActivePathfindingEnemies();
 }
 
 void AMyPlayer::ActivePathfindingEnemies()
@@ -85,7 +82,6 @@ void AMyPlayer::ActivePathfindingEnemies()
 void AMyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input

@@ -84,7 +84,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         //RIGHT
         int rightPosition = actualPosition + 1;
         if (rightPosition > 0 && rightPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
-            if (gameMode->grid_[rightPosition] != NodeType::Wall) {
+            if (gameMode->grid_[rightPosition] == NodeType::Ground) {
                 FPathInfo enemyLoopRight;
 
                 enemyLoopRight.positionFromTheStart = loopInPath_;
@@ -102,7 +102,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         //UP
         int upPosition = actualPosition - gameMode->gridSize_.X;
         if (upPosition > 0 && upPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
-            if (gameMode->grid_[upPosition] != NodeType::Wall) {
+            if (gameMode->grid_[upPosition] == NodeType::Ground) {
                 FPathInfo enemyLoopUp;
                 enemyLoopUp.positionFromTheStart = loopInPath_;
                 enemyLoopUp.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(upPosition, originPosition);
@@ -119,7 +119,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         //LEFT
         int leftPosition = actualPosition - 1;
         if (leftPosition > 0 && leftPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
-            if (gameMode->grid_[leftPosition] != NodeType::Wall) {
+            if (gameMode->grid_[leftPosition] == NodeType::Ground) {
                 FPathInfo enemyLoopLeft;
                 enemyLoopLeft.positionFromTheStart = loopInPath_;
                 enemyLoopLeft.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(leftPosition, originPosition);
@@ -135,7 +135,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         //DOWN
         int downPosition = actualPosition + gameMode->gridSize_.X;
         if (downPosition > 0 && downPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {          
-            if (gameMode->grid_[downPosition] != NodeType::Wall) {
+            if (gameMode->grid_[downPosition] == NodeType::Ground) {
                 FPathInfo enemyLoopDown;
                 enemyLoopDown.positionFromTheStart = loopInPath_;
                 enemyLoopDown.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(downPosition, originPosition);
@@ -212,6 +212,7 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
   timer += DeltaTime;
   if (timer >= 0.66f) { 
+      PathFinding(actualPositionPath, originPositionPath);
       ExecuteMovement();
       UE_LOG(LogTemp, Warning, TEXT("-----TICK ENEMY-----"));
       timer = 0.0f;   

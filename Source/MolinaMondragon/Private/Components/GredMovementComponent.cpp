@@ -38,33 +38,39 @@ FVector UGredMovementComponent::GetWorldPosition()
 
 void UGredMovementComponent::MoveUp()
 {
-  GridPosition_ -= GM_->gridSize_.X;
+    GM_->grid_[GridPosition_] = NodeType::Ground;
+    GridPosition_ -= GM_->gridSize_.X;
+    GM_->grid_[GridPosition_] = NodeType::Ocupped;
 }
 
 void UGredMovementComponent::MoveLeft()
 {
+    GM_->grid_[GridPosition_] = NodeType::Ground;
   GridPosition_ -= 1;
+  GM_->grid_[GridPosition_] = NodeType::Ocupped;
 }
 
 void UGredMovementComponent::MoveRight()
 {
+    GM_->grid_[GridPosition_] = NodeType::Ground;
   GridPosition_ += 1;
+  GM_->grid_[GridPosition_] = NodeType::Ocupped;
 }
 
 void UGredMovementComponent::MoveDown()
 {
+    GM_->grid_[GridPosition_] = NodeType::Ground;
   GridPosition_ += GM_->gridSize_.X;
+  GM_->grid_[GridPosition_] = NodeType::Ocupped;
 }
 
 int UGredMovementComponent::RandomWalkableNode()
-{
-    GM_ = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-    
+{  
     int sizegrid = GM_->gridSize_.X * GM_->gridSize_.Y;
 
     while(true){
         int randomNode = FMath::RandRange(0, sizegrid);
-        if (grid_[randomNode] == NodeType::Ground) {
+        if (GM_->grid_[randomNode] == NodeType::Ground) {
             return randomNode;
         }
     }
@@ -87,8 +93,6 @@ int UGredMovementComponent::ManhattanDistance(int origin, int dest)
 
 FVector UGredMovementComponent::Index2RowCol(int idx)
 {
-    GM_ = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
     if (idx < 0 || idx > GM_->gridSize_.X * GM_->gridSize_.Y ) {
         return FVector().ZeroVector; 
     }
