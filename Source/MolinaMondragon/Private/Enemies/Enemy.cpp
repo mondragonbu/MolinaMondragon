@@ -363,6 +363,11 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         loopInPath_++;
     }
 
+    if (!loopFinished) {
+        openList_.Empty();
+        closedList_.Empty();
+    }
+
     UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
     BuildPath(originPosition);
 }
@@ -370,44 +375,49 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
 void AEnemy::BuildPath(int origin)
 {
     TArray<MovementsEnemy> movement_;    
-    FPathInfo actualPointPath = closedList_.Last();
+    if (closedList_.Num() > 0) {
+        FPathInfo actualPointPath = closedList_.Last();
+
+        while (actualPointPath.fatherPath != nullptr) {
+            if (actualPointPath.fatherPath->positionX < actualPointPath.positionX) {
+                movement_.Add(MovementsEnemy::Right);
+            }
+            else if (actualPointPath.fatherPath->positionX > actualPointPath.positionX) {
+                movement_.Add(MovementsEnemy::Left);
+            }
+            else if (actualPointPath.fatherPath->positionY < actualPointPath.positionY) {
+                movement_.Add(MovementsEnemy::Down);
+            }
+            else if (actualPointPath.fatherPath->positionY > actualPointPath.positionY) {
+                movement_.Add(MovementsEnemy::Up);
+            }
+
+            actualPointPath = *actualPointPath.fatherPath;
+        }
+
+        movementEnemy_.Empty();
+
+        for (int i = movement_.Num() - 1; i >= 0; i--) {
+            movementEnemy_.Add(movement_[i]);
+        }
+
+        if (GridMovementComponent_->Index2RowCol(origin).X > actualPointPath.positionX) {
+            movementEnemy_.Add(MovementsEnemy::Right);
+        }
+        else if (GridMovementComponent_->Index2RowCol(origin).X < actualPointPath.positionX) {
+            movementEnemy_.Add(MovementsEnemy::Left);
+        }
+        else if (GridMovementComponent_->Index2RowCol(origin).Y > actualPointPath.positionY) {
+            movementEnemy_.Add(MovementsEnemy::Down);
+        }
+        else if (GridMovementComponent_->Index2RowCol(origin).Y < actualPointPath.positionY) {
+            movementEnemy_.Add(MovementsEnemy::Up);
+        }
+    }
+    else {
+        movementEnemy_.Add(MovementsEnemy::None);
+    }
     
-    while (actualPointPath.fatherPath != nullptr) {
-        if (actualPointPath.fatherPath->positionX < actualPointPath.positionX) {
-            movement_.Add(MovementsEnemy::Right);
-        }
-        else if (actualPointPath.fatherPath->positionX > actualPointPath.positionX) {
-            movement_.Add(MovementsEnemy::Left);
-        }
-        else if (actualPointPath.fatherPath->positionY < actualPointPath.positionY) {
-            movement_.Add(MovementsEnemy::Down);
-        }
-        else if (actualPointPath.fatherPath->positionY > actualPointPath.positionY) {
-            movement_.Add(MovementsEnemy::Up);
-        }
-
-        actualPointPath = *actualPointPath.fatherPath;
-    }
-
-    movementEnemy_.Empty();
-
-    for (int i = movement_.Num() - 1; i >= 0; i--) {
-        movementEnemy_.Add(movement_[i]);
-    }
-
-    if (GridMovementComponent_->Index2RowCol(origin).X > actualPointPath.positionX) {
-        movementEnemy_.Add(MovementsEnemy::Right);
-    }
-    else if (GridMovementComponent_->Index2RowCol(origin).X < actualPointPath.positionX) {
-        movementEnemy_.Add(MovementsEnemy::Left);
-    }
-    else if (GridMovementComponent_->Index2RowCol(origin).Y > actualPointPath.positionY) {
-        movementEnemy_.Add(MovementsEnemy::Down);
-    }
-    else if (GridMovementComponent_->Index2RowCol(origin).Y < actualPointPath.positionY) {
-        movementEnemy_.Add(MovementsEnemy::Up);
-    }
-
     UE_LOG(LogTemp, Warning, TEXT("-----BUILD PATH-----"));
 }
 
@@ -416,6 +426,10 @@ void AEnemy::ExecuteMovement()
     if (movementEnemy_.Num() > 1) {
         switch (movementEnemy_[0])
         {
+        case MovementsEnemy::None:
+            actualPositionPath = GridMovementComponent_->GridPosition_;
+            movementEnemy_.RemoveAt(0);
+            break;
         case MovementsEnemy::Right:
             this->MoveRight();
             actualPositionPath = GridMovementComponent_->GridPosition_;
