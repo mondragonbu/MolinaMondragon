@@ -48,4 +48,6 @@ public:
       int ManhattanDistance(int origin, int dest);
   UFUNCTION()
       FVector Index2RowCol(int idx);
+  UFUNCTION()
+      int RowCol2Index(int x, int y);
 };

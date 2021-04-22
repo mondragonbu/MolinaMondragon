@@ -12,14 +12,12 @@ struct FPathInfo
 {
     GENERATED_USTRUCT_BODY();
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        float positionFromTheStart = 0.0f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        float distanceToTheEnd = 0.0f;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        float positionPlusDistance = 0.0f;
+        int positionX = 0;
+        int positionY = 0;
+        int positionFromTheStart = 0;
+        int distanceToTheEnd = 0;
+        int positionPlusDistance = 0;
+        FPathInfo* fatherPath;
 };
 
 UENUM(BlueprintType)
@@ -59,7 +57,9 @@ public:
   UFUNCTION()
     void ExecuteInternalPathfinding();
 
-  TArray<FPathInfo> pathInfo_;
+
+  TArray<FPathInfo> openList_;
+  TArray<FPathInfo> closedList_;
   TArray<MovementsEnemy> movementEnemy_;
   
 protected:
@@ -67,6 +67,7 @@ protected:
 	virtual void BeginPlay() override;
 
   void PathFinding(int actualPosition, int originPosition);
+  void BuildPath(int origin);
   void ExecuteMovement();
 
   int actualPositionPath;

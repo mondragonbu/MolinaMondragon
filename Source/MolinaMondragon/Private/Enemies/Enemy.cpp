@@ -73,114 +73,346 @@ void AEnemy::BeginPlay()
 
 void AEnemy::PathFinding(int actualPosition, int originPosition)
 {
-    ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-        
+    openList_.Empty();
+    closedList_.Empty();
+    
+    //INSERT FIRST NODE IN THE OPEN LIST
+    FPathInfo firstNode;
+    firstNode.positionX = GridMovementComponent_->Index2RowCol(actualPosition).X;
+    firstNode.positionY = GridMovementComponent_->Index2RowCol(actualPosition).Y;
+    firstNode.positionFromTheStart = 0;
+    firstNode.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(actualPosition, originPosition);
+    firstNode.positionPlusDistance = firstNode.positionFromTheStart + firstNode.distanceToTheEnd;
+    firstNode.fatherPath = nullptr;
+
+
+    openList_.Add(firstNode);
     loopInPath_ = 1;
-    movementEnemy_.Empty();
+    bool loopFinished = false;
+    
+    while (openList_.Num() > 0 && !loopFinished)
+    {       
+        FPathInfo lowestScore;
+        int lowestScoreNum = 1000;
 
-    while (actualPosition != originPosition) {
-
-        int actualDirection = -1;
-        int actualMinDist = 100;
-
-        //RIGHT
-        int rightPosition = actualPosition + 1;
-        if (rightPosition > 0 && rightPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
-            if (gameMode->grid_[rightPosition] == NodeType::Ground) {
-                FPathInfo enemyLoopRight;
-
-                enemyLoopRight.positionFromTheStart = loopInPath_;
-                enemyLoopRight.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(rightPosition, originPosition);
-                enemyLoopRight.positionPlusDistance = enemyLoopRight.positionFromTheStart + enemyLoopRight.distanceToTheEnd;
-
-                //pathInfo_.Add(enemyLoopRight);
-                if (enemyLoopRight.positionPlusDistance < actualMinDist) {
-                    actualDirection = 1;
-                    actualMinDist = enemyLoopRight.positionPlusDistance;
-                }
-            }
-        }       
-
-        //UP
-        int upPosition = actualPosition - gameMode->gridSize_.X;
-        if (upPosition > 0 && upPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
-            if (gameMode->grid_[upPosition] == NodeType::Ground) {
-                FPathInfo enemyLoopUp;
-                enemyLoopUp.positionFromTheStart = loopInPath_;
-                enemyLoopUp.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(upPosition, originPosition);
-                enemyLoopUp.positionPlusDistance = enemyLoopUp.positionFromTheStart + enemyLoopUp.distanceToTheEnd;
-                //pathInfo_.Add(enemyLoopUp);
-                if (enemyLoopUp.positionPlusDistance < actualMinDist) {
-                    actualDirection = 2;
-                    actualMinDist = enemyLoopUp.positionPlusDistance;
-                }
+        //GET THE SQUARE WITH THE LOWEST SCORE
+        for (FPathInfo p : openList_) {
+            if (p.positionPlusDistance < lowestScoreNum) {
+                lowestScore = p;
+                lowestScoreNum = p.positionPlusDistance;
             }
         }
-        
 
-        //LEFT
-        int leftPosition = actualPosition - 1;
-        if (leftPosition > 0 && leftPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
-            if (gameMode->grid_[leftPosition] == NodeType::Ground) {
-                FPathInfo enemyLoopLeft;
-                enemyLoopLeft.positionFromTheStart = loopInPath_;
-                enemyLoopLeft.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(leftPosition, originPosition);
-                enemyLoopLeft.positionPlusDistance = enemyLoopLeft.positionFromTheStart + enemyLoopLeft.distanceToTheEnd;
-                //pathInfo_.Add(enemyLoopLeft);
-                if (enemyLoopLeft.positionPlusDistance < actualMinDist) {
-                    actualDirection = 3;
-                    actualMinDist = enemyLoopLeft.positionPlusDistance;
+        //REMOVE FROM THE OPEN LIST
+        int positionToRemove = 0;
+        for (int i = 0; i< openList_.Num();i++)
+        {
+            if (openList_[i].positionX == lowestScore.positionX && openList_[i].positionY == lowestScore.positionY) {
+                positionToRemove = i;
+            }
+        }
+
+        openList_.RemoveAt(positionToRemove);
+
+        //ADD TO THE CLOSED LIST
+        closedList_.Add(lowestScore);
+        
+        //CHECK NEIGHBOURDS
+        ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+        for (FPathInfo p : closedList_) {           
+            //RIGHT
+            int rightPosition = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY) + 1;
+            if (rightPosition > 0 && rightPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+                if (gameMode->grid_[rightPosition] == NodeType::Ground) {
+                    FPathInfo enemyLoopRight;
+
+                    enemyLoopRight.positionX = GridMovementComponent_->Index2RowCol(rightPosition).X;
+                    enemyLoopRight.positionY = GridMovementComponent_->Index2RowCol(rightPosition).Y;
+                    enemyLoopRight.positionFromTheStart = loopInPath_;
+                    enemyLoopRight.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(rightPosition, originPosition);
+                    enemyLoopRight.positionPlusDistance = enemyLoopRight.positionFromTheStart + enemyLoopRight.distanceToTheEnd;
+                    //enemyLoopRight.fatherPath = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY);
+                    FPathInfo* pathTmp = new FPathInfo();
+                    pathTmp->positionX = p.positionX;
+                    pathTmp->positionY = p.positionY;
+                    pathTmp->positionFromTheStart = p.positionFromTheStart;
+                    pathTmp->distanceToTheEnd = p.distanceToTheEnd;
+                    pathTmp->positionPlusDistance = p.positionPlusDistance;
+                    pathTmp->fatherPath = p.fatherPath;
+                    enemyLoopRight.fatherPath = pathTmp;
+
+                    if (enemyLoopRight.distanceToTheEnd < 1) {
+                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        loopFinished = true;
+                    }
+
+                    bool isInOpenList = false;
+                    int positionToUpdate = 0;
+                    for (int i = 0; i < openList_.Num(); i++) {
+                        if (openList_[i].positionX == enemyLoopRight.positionX && openList_[i].positionY == enemyLoopRight.positionY) {
+                            isInOpenList = true;
+                            positionToUpdate = i;
+                        }
+                    }
+
+                    //CHECK IF IS IN CLOSED LIST
+                    bool isInClosedList = false;
+                    for (int i = 0; i < closedList_.Num(); i++) {
+                        if (closedList_[i].positionX == enemyLoopRight.positionX && closedList_[i].positionY == enemyLoopRight.positionY) {
+                            isInClosedList = true;
+                        }
+                    }
+
+                    if (!isInClosedList) {
+                        if (isInOpenList) {
+                            if (enemyLoopRight.positionPlusDistance < openList_[positionToUpdate].positionPlusDistance) {
+                                openList_[positionToUpdate].positionFromTheStart = enemyLoopRight.positionFromTheStart;
+                                openList_[positionToUpdate].distanceToTheEnd = enemyLoopRight.distanceToTheEnd;
+                                openList_[positionToUpdate].positionPlusDistance = enemyLoopRight.positionPlusDistance;
+                                openList_[positionToUpdate].fatherPath = enemyLoopRight.fatherPath;
+                            }
+                        }
+                        else {
+                            openList_.Add(enemyLoopRight);
+                        }
+                    }
+                    
                 }
             }
-        }     
 
-        //DOWN
-        int downPosition = actualPosition + gameMode->gridSize_.X;
-        if (downPosition > 0 && downPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {          
-            if (gameMode->grid_[downPosition] == NodeType::Ground) {
-                FPathInfo enemyLoopDown;
-                enemyLoopDown.positionFromTheStart = loopInPath_;
-                enemyLoopDown.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(downPosition, originPosition);
-                enemyLoopDown.positionPlusDistance = enemyLoopDown.positionFromTheStart + enemyLoopDown.distanceToTheEnd;
-                //pathInfo_.Add(enemyLoopDown);
-                if (enemyLoopDown.positionPlusDistance < actualMinDist) {
-                    actualDirection = 4;
-                    actualMinDist = enemyLoopDown.positionPlusDistance;
+            //UP
+            int upPosition = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY) - gameMode->gridSize_.X;
+            if (upPosition > 0 && upPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+                if (gameMode->grid_[upPosition] == NodeType::Ground) {
+                    FPathInfo enemyLoopUp;
+
+                    enemyLoopUp.positionX = GridMovementComponent_->Index2RowCol(upPosition).X;
+                    enemyLoopUp.positionY = GridMovementComponent_->Index2RowCol(upPosition).Y;
+                    enemyLoopUp.positionFromTheStart = loopInPath_;
+                    enemyLoopUp.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(upPosition, originPosition);
+                    enemyLoopUp.positionPlusDistance = enemyLoopUp.positionFromTheStart + enemyLoopUp.distanceToTheEnd;
+                    //enemyLoopUp.fatherPath = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY);
+                    FPathInfo* pathTmp = new FPathInfo();
+                    pathTmp->positionX = p.positionX;
+                    pathTmp->positionY = p.positionY;
+                    pathTmp->positionFromTheStart = p.positionFromTheStart;
+                    pathTmp->distanceToTheEnd = p.distanceToTheEnd;
+                    pathTmp->positionPlusDistance = p.positionPlusDistance;
+                    pathTmp->fatherPath = p.fatherPath;
+                    enemyLoopUp.fatherPath = pathTmp;
+
+                    if (enemyLoopUp.distanceToTheEnd < 1) {
+                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        loopFinished = true;
+                    }
+
+                    bool isInOpenList = false;
+                    int positionToUpdate = 0;
+                    for (int i = 0; i < openList_.Num(); i++) {
+                        if (openList_[i].positionX == enemyLoopUp.positionX && openList_[i].positionY == enemyLoopUp.positionY) {
+                            isInOpenList = true;
+                            positionToUpdate = i;
+                        }
+                    }
+
+                    //CHECK IF IS IN CLOSED LIST
+                    bool isInClosedList = false;
+                    for (int i = 0; i < closedList_.Num(); i++) {
+                        if (closedList_[i].positionX == enemyLoopUp.positionX && closedList_[i].positionY == enemyLoopUp.positionY) {
+                            isInClosedList = true;
+                        }
+                    }
+
+                    if (!isInClosedList) {
+                        if (isInOpenList) {
+                            if (enemyLoopUp.positionPlusDistance < openList_[positionToUpdate].positionPlusDistance) {
+                                openList_[positionToUpdate].positionFromTheStart = enemyLoopUp.positionFromTheStart;
+                                openList_[positionToUpdate].distanceToTheEnd = enemyLoopUp.distanceToTheEnd;
+                                openList_[positionToUpdate].positionPlusDistance = enemyLoopUp.positionPlusDistance;
+                                openList_[positionToUpdate].fatherPath = enemyLoopUp.fatherPath;
+                            }
+                        }
+                        else {
+                            openList_.Add(enemyLoopUp);
+                        }
+                    }       
                 }
             }
-        } 
-        
 
-        switch (actualDirection) {
-        case 1:
-            actualPosition = actualPosition + 1;
-            movementEnemy_.Add(MovementsEnemy::Right);
-            break;
-        case 2:
-            actualPosition = actualPosition - gameMode->gridSize_.X;
-            movementEnemy_.Add(MovementsEnemy::Up);
-            break;
-        case 3:
-            actualPosition = actualPosition - 1;
-            movementEnemy_.Add(MovementsEnemy::Left);
-            break;
-        case 4:
-            actualPosition = actualPosition + gameMode->gridSize_.X;
-            movementEnemy_.Add(MovementsEnemy::Down);
-            break;
+            //LEFT
+            int leftPosition = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY) - 1;
+            if (leftPosition > 0 && leftPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+                if (gameMode->grid_[leftPosition] == NodeType::Ground) {
+                    FPathInfo enemyLoopLeft;
+
+                    enemyLoopLeft.positionX = GridMovementComponent_->Index2RowCol(leftPosition).X;
+                    enemyLoopLeft.positionY = GridMovementComponent_->Index2RowCol(leftPosition).Y;
+                    enemyLoopLeft.positionFromTheStart = loopInPath_;
+                    enemyLoopLeft.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(leftPosition, originPosition);
+                    enemyLoopLeft.positionPlusDistance = enemyLoopLeft.positionFromTheStart + enemyLoopLeft.distanceToTheEnd;
+                    //enemyLoopLeft.fatherPath = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY);
+                    FPathInfo* pathTmp = new FPathInfo();
+                    pathTmp->positionX = p.positionX;
+                    pathTmp->positionY = p.positionY;
+                    pathTmp->positionFromTheStart = p.positionFromTheStart;
+                    pathTmp->distanceToTheEnd = p.distanceToTheEnd;
+                    pathTmp->positionPlusDistance = p.positionPlusDistance;
+                    pathTmp->fatherPath = p.fatherPath;
+                    enemyLoopLeft.fatherPath = pathTmp;
+
+                    if (enemyLoopLeft.distanceToTheEnd < 1) {
+                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        loopFinished = true;
+                    }
+
+                    bool isInOpenList = false;
+                    int positionToUpdate = 0;
+                    for (int i = 0; i < openList_.Num(); i++) {
+                        if (openList_[i].positionX == enemyLoopLeft.positionX && openList_[i].positionY == enemyLoopLeft.positionY) {
+                            isInOpenList = true;
+                            positionToUpdate = i;
+                        }
+                    }
+
+
+                    //CHECK IF IS IN CLOSED LIST
+                    bool isInClosedList = false;
+                    for (int i = 0; i < closedList_.Num(); i++) {
+                        if (closedList_[i].positionX == enemyLoopLeft.positionX && closedList_[i].positionY == enemyLoopLeft.positionY) {
+                            isInClosedList = true;
+                        }
+                    }
+
+                    if (!isInClosedList) {
+                        if (isInOpenList) {
+                            if (enemyLoopLeft.positionPlusDistance < openList_[positionToUpdate].positionPlusDistance) {
+                                openList_[positionToUpdate].positionFromTheStart = enemyLoopLeft.positionFromTheStart;
+                                openList_[positionToUpdate].distanceToTheEnd = enemyLoopLeft.distanceToTheEnd;
+                                openList_[positionToUpdate].positionPlusDistance = enemyLoopLeft.positionPlusDistance;
+                                openList_[positionToUpdate].fatherPath = enemyLoopLeft.fatherPath;
+                            }
+                        }
+                        else {
+                            openList_.Add(enemyLoopLeft);
+                        }
+                    }        
+                }
+            }
+
+            //DOWN
+            int downPosition = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY) + gameMode->gridSize_.X;
+            if (downPosition > 0 && downPosition < gameMode->gridSize_.X * gameMode->gridSize_.Y) {
+                if (gameMode->grid_[downPosition] == NodeType::Ground) {
+                    FPathInfo enemyLoopDown;
+
+                    enemyLoopDown.positionX = GridMovementComponent_->Index2RowCol(downPosition).X;
+                    enemyLoopDown.positionY = GridMovementComponent_->Index2RowCol(downPosition).Y;
+                    enemyLoopDown.positionFromTheStart = loopInPath_;
+                    enemyLoopDown.distanceToTheEnd = GridMovementComponent_->ManhattanDistance(downPosition, originPosition);
+                    enemyLoopDown.positionPlusDistance = enemyLoopDown.positionFromTheStart + enemyLoopDown.distanceToTheEnd;
+                    //enemyLoopDown.fatherPath = GridMovementComponent_->RowCol2Index(p.positionX, p.positionY);
+                    FPathInfo* pathTmp = new FPathInfo();
+                    pathTmp->positionX = p.positionX;
+                    pathTmp->positionY = p.positionY;
+                    pathTmp->positionFromTheStart = p.positionFromTheStart;
+                    pathTmp->distanceToTheEnd = p.distanceToTheEnd;
+                    pathTmp->positionPlusDistance = p.positionPlusDistance;
+                    pathTmp->fatherPath = p.fatherPath;
+                    enemyLoopDown.fatherPath = pathTmp;
+
+                    if (enemyLoopDown.distanceToTheEnd < 1) {
+                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        loopFinished = true;
+                    }
+
+                    bool isInOpenList = false;
+                    int positionToUpdate = 0;
+                    for (int i = 0; i < openList_.Num(); i++) {
+                        if (openList_[i].positionX == enemyLoopDown.positionX && openList_[i].positionY == enemyLoopDown.positionY) {
+                            isInOpenList = true;
+                            positionToUpdate = i;
+                        }
+                    }
+
+                    //CHECK IF IS IN CLOSED LIST
+                    bool isInClosedList = false;
+                    for (int i = 0; i < closedList_.Num(); i++) {
+                        if (closedList_[i].positionX == enemyLoopDown.positionX && closedList_[i].positionY == enemyLoopDown.positionY) {
+                            isInClosedList = true;
+                        }
+                    }
+
+                    if (!isInClosedList) {
+                        if (isInOpenList) {
+                            if (enemyLoopDown.positionPlusDistance < openList_[positionToUpdate].positionPlusDistance) {
+                                openList_[positionToUpdate].positionFromTheStart = enemyLoopDown.positionFromTheStart;
+                                openList_[positionToUpdate].distanceToTheEnd = enemyLoopDown.distanceToTheEnd;
+                                openList_[positionToUpdate].positionPlusDistance = enemyLoopDown.positionPlusDistance;
+                                openList_[positionToUpdate].fatherPath = enemyLoopDown.fatherPath;
+                            }
+                        }
+                        else {
+                            openList_.Add(enemyLoopDown);
+                        }
+                    }             
+                }
+            }
+                     
         }
 
         loopInPath_++;
-        if (loopInPath_ >= maxLoopsPathfinding_) {
-            actualPosition = originPosition;
-        }
     }
-        
+
     UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
+    BuildPath(originPosition);
+}
+
+void AEnemy::BuildPath(int origin)
+{
+    TArray<MovementsEnemy> movement_;    
+    FPathInfo actualPointPath = closedList_.Last();
+    
+    while (actualPointPath.fatherPath != nullptr) {
+        if (actualPointPath.fatherPath->positionX < actualPointPath.positionX) {
+            movement_.Add(MovementsEnemy::Right);
+        }
+        else if (actualPointPath.fatherPath->positionX > actualPointPath.positionX) {
+            movement_.Add(MovementsEnemy::Left);
+        }
+        else if (actualPointPath.fatherPath->positionY < actualPointPath.positionY) {
+            movement_.Add(MovementsEnemy::Down);
+        }
+        else if (actualPointPath.fatherPath->positionY > actualPointPath.positionY) {
+            movement_.Add(MovementsEnemy::Up);
+        }
+
+        actualPointPath = *actualPointPath.fatherPath;
+    }
+
+    movementEnemy_.Empty();
+
+    for (int i = movement_.Num() - 1; i >= 0; i--) {
+        movementEnemy_.Add(movement_[i]);
+    }
+
+    if (GridMovementComponent_->Index2RowCol(origin).X > actualPointPath.positionX) {
+        movementEnemy_.Add(MovementsEnemy::Right);
+    }
+    else if (GridMovementComponent_->Index2RowCol(origin).X < actualPointPath.positionX) {
+        movementEnemy_.Add(MovementsEnemy::Left);
+    }
+    else if (GridMovementComponent_->Index2RowCol(origin).Y > actualPointPath.positionY) {
+        movementEnemy_.Add(MovementsEnemy::Down);
+    }
+    else if (GridMovementComponent_->Index2RowCol(origin).Y < actualPointPath.positionY) {
+        movementEnemy_.Add(MovementsEnemy::Up);
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("-----BUILD PATH-----"));
 }
 
 void AEnemy::ExecuteMovement()
-{
+{  
     if (movementEnemy_.Num() > 1) {
         switch (movementEnemy_[0])
         {
@@ -216,10 +448,9 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
   timer += DeltaTime;
-  if (timer >= 1.0f) { 
+  if (timer >= 0.66f) { 
       ExecuteInternalPathfinding();
       ExecuteMovement();
-      UE_LOG(LogTemp, Warning, TEXT("-----TICK ENEMY-----"));
       timer = 0.0f;   
   }
 }

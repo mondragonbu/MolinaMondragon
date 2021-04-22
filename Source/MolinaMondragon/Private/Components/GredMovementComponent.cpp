@@ -100,7 +100,15 @@ FVector UGredMovementComponent::Index2RowCol(int idx)
         return FVector().ZeroVector; 
     }
 
-    return FVector(idx / GM_->gridSize_.X, idx % (int)GM_->gridSize_.X, 0);
+    int Y = idx / GM_->gridSize_.X;
+    int X = idx - Y * GM_->gridSize_.X;
+
+    return FVector(X, Y, 0);
+}
+
+int UGredMovementComponent::RowCol2Index(int x, int y)
+{
+    return (y * GM_->gridSize_.X) + x;
 }
 
 
