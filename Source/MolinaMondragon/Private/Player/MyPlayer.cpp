@@ -20,6 +20,9 @@ AMyPlayer::AMyPlayer()
   GridMovementComponent_ = CreateDefaultSubobject<UGredMovementComponent>("Grid Movement Component");
 
   gameIsPaused = false;
+  playerHealth_ = 100;
+  playerScore_ = 0;
+  temporalTimer_ = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -102,10 +105,49 @@ void AMyPlayer::PauseController()
 
 }
 
+void AMyPlayer::GetDamage(int dmg)
+{
+    AIngameHUD* hud = Cast<AIngameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
+    if (hud != nullptr) {
+        if (playerHealth_ - dmg > 0) {
+            playerHealth_ -= dmg;
+            hud->SetHealthPlayer(playerHealth_);
+        }
+        else {
+            //DEATH
+        }
+    }  
+}
+
+int AMyPlayer::GetHealth()
+{
+    return playerHealth_;
+}
+
+void AMyPlayer::AddScore(int score)
+{
+    AIngameHUD* hud = Cast<AIngameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
+    playerScore_ += score;
+    if (hud != nullptr) {
+        hud->SetScorePlayer(playerScore_);
+    }
+}
+
+int AMyPlayer::GetScore()
+{
+    return playerScore_;
+}
+
 // Called every frame
 void AMyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+  temporalTimer_ += DeltaTime;
+  if (temporalTimer_ >= 1.0f) {
+      GetDamage(1);
+      AddScore(100);
+      temporalTimer_ = 0.0f;
+  }
 }
 
 // Called to bind functionality to input

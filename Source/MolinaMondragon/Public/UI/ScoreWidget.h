@@ -13,7 +13,10 @@ UCLASS()
 class MOLINAMONDRAGON_API UScoreWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+    void SetScore(int score);
+
 protected:
     /* Properties from the widget*/
     UPROPERTY(meta = (BindWidget), BlueprintReadWrite)

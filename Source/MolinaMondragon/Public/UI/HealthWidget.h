@@ -14,6 +14,9 @@ class MOLINAMONDRAGON_API UHealthWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+
+    void SetHealth(int health);
 protected:
     /* Properties from the widget*/
     UPROPERTY(meta = (BindWidget), BlueprintReadWrite)

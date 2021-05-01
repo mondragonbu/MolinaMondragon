@@ -39,4 +39,10 @@ public:
 
     UFUNCTION()
         void DeletePause();
+
+    UFUNCTION()
+        void SetHealthPlayer(int h);
+
+    UFUNCTION()
+        void SetScorePlayer(int s);
 };

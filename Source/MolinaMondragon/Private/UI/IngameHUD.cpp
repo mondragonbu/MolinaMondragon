@@ -30,3 +30,13 @@ void AIngameHUD::DeletePause()
         pauseMenuWidgetInstance_->RemoveFromViewport();
     }
 }
+
+void AIngameHUD::SetHealthPlayer(int h)
+{
+    healthWidgetInstance_->SetHealth(h);
+}
+
+void AIngameHUD::SetScorePlayer(int s)
+{
+    scoreWidgetInstance_->SetScore(s);
+}

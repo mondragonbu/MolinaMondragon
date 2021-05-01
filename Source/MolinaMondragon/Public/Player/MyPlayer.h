@@ -23,6 +23,17 @@ public:
 
   UFUNCTION()
       void PauseController();
+
+  UFUNCTION()
+      void GetDamage(int dmg);
+  UFUNCTION()
+      int GetHealth();
+
+  UFUNCTION()
+      void AddScore(int score);
+  UFUNCTION()
+      int GetScore();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,6 +51,10 @@ private:
   UFUNCTION()
     void ActivePathfindingEnemies();
   
+  int playerHealth_;
+  int playerScore_;
+
+  float temporalTimer_;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
