@@ -6,6 +6,8 @@
 #include "Enemies/Enemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameModes/DungeonGameMode.h"
+#include "GameModes/DungeonPlayerController.h"
+#include "UI/IngameHUD.h"
 
 #include "Components/GredMovementComponent.h"
 // Sets default values
@@ -17,6 +19,7 @@ AMyPlayer::AMyPlayer()
   Mesh_->SetupAttachment(RootComponent);
   GridMovementComponent_ = CreateDefaultSubobject<UGredMovementComponent>("Grid Movement Component");
 
+  gameIsPaused = false;
 }
 
 // Called when the game starts or when spawned
@@ -79,6 +82,26 @@ void AMyPlayer::ActivePathfindingEnemies()
     }
 }
 
+void AMyPlayer::PauseController()
+{
+    AIngameHUD* hud = Cast<AIngameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
+    ADungeonPlayerController* player = Cast<ADungeonPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+    if (gameIsPaused) {
+        hud->DeletePause();
+        gameIsPaused = false;
+        player->SetPause(gameIsPaused);
+        player->SetInputMode(FInputModeGameOnly());
+    }
+    else {
+        hud->CreatePause();
+        gameIsPaused = true;
+        player->SetPause(gameIsPaused);
+        player->SetInputMode(FInputModeGameAndUI());
+    }
+
+}
+
 // Called every frame
 void AMyPlayer::Tick(float DeltaTime)
 {
@@ -93,6 +116,6 @@ void AMyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
   PlayerInputComponent->BindAction("DOWN", IE_Pressed, this, &AMyPlayer::MoveDown);
   PlayerInputComponent->BindAction("LEFT", IE_Pressed, this, &AMyPlayer::MoveLeft);
   PlayerInputComponent->BindAction("RIGHT", IE_Pressed, this, &AMyPlayer::MoveRight);
-
+  PlayerInputComponent->BindAction("PAUSE", IE_Pressed, this, &AMyPlayer::PauseController).bExecuteWhenPaused = true;
 }
 

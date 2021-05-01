@@ -12,9 +12,19 @@ void UMainMenuWidget::NativeConstruct()
     GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameAndUI());
     GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 
-    NewGame->OnClicked.AddDynamic(this, &UMainMenuWidget::NewGameClicked);
-    Credits->OnClicked.AddDynamic(this, &UMainMenuWidget::NewGameClicked);
-    Exit->OnClicked.AddDynamic(this, &UMainMenuWidget::ExitClicked);
+    NewGame_->OnClicked.AddDynamic(this, &UMainMenuWidget::NewGameClicked);
+    NewGame_->SetUserFocus(GetOwningPlayer());
+    Credits_->OnClicked.AddDynamic(this, &UMainMenuWidget::NewGameClicked);
+    Exit_->OnClicked.AddDynamic(this, &UMainMenuWidget::ExitClicked);
+}
+
+FReply UMainMenuWidget::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+    Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
+    
+    NewGame_->SetUserFocus(GetOwningPlayer());
+
+    return FReply::Handled();
 }
 
 void UMainMenuWidget::NewGameClicked()

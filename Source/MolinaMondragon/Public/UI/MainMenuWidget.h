@@ -16,17 +16,19 @@ class MOLINAMONDRAGON_API UMainMenuWidget : public UUserWidget
 
 public:
     virtual void NativeConstruct() override;
+    virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry,
+        const FFocusEvent& InFocusEvent) override;
 	
 protected:
       /* Properties from the widget*/
       UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
-      class UButton* NewGame;
+      class UButton* NewGame_;
 
       UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
-          class UButton* Exit;
+          class UButton* Exit_;
 
       UPROPERTY(meta = (BindWidget), BlueprintReadWrite)
-          class UButton* Credits;
+          class UButton* Credits_;
 
       UFUNCTION()
           void NewGameClicked();

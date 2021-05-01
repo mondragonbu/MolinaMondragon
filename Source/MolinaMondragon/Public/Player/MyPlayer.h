@@ -20,9 +20,14 @@ public:
   float health_;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
+
+  UFUNCTION()
+      void PauseController();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+  bool gameIsPaused;
 private:
   UFUNCTION()
     void MoveUp();
@@ -34,6 +39,7 @@ private:
     void MoveRight();
   UFUNCTION()
     void ActivePathfindingEnemies();
+  
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
