@@ -35,4 +35,7 @@ protected:
 
       UFUNCTION()
           void ExitClicked();
+
+      UFUNCTION()
+          void CreditsClicked();
 };

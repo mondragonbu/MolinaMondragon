@@ -4,6 +4,7 @@
 #include "UI/MainMenuWidget.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/MainMenuHud.h"
 
 void UMainMenuWidget::NativeConstruct()
 {
@@ -14,7 +15,7 @@ void UMainMenuWidget::NativeConstruct()
 
     NewGame_->OnClicked.AddDynamic(this, &UMainMenuWidget::NewGameClicked);
     NewGame_->SetUserFocus(GetOwningPlayer());
-    Credits_->OnClicked.AddDynamic(this, &UMainMenuWidget::NewGameClicked);
+    Credits_->OnClicked.AddDynamic(this, &UMainMenuWidget::CreditsClicked);
     Exit_->OnClicked.AddDynamic(this, &UMainMenuWidget::ExitClicked);
 }
 
@@ -35,4 +36,10 @@ void UMainMenuWidget::NewGameClicked()
 void UMainMenuWidget::ExitClicked()
 {
     UKismetSystemLibrary::QuitGame(GetWorld(), NULL, EQuitPreference::Quit, true);
+}
+
+void UMainMenuWidget::CreditsClicked()
+{
+    AMainMenuHud* menu = Cast<AMainMenuHud>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
+    menu->changeToCredits(true);
 }
