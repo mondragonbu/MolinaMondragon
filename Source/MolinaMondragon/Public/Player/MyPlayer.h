@@ -21,6 +21,7 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
 
+
   UFUNCTION()
       void PauseController();
 
@@ -33,6 +34,12 @@ public:
       void AddScore(int score);
   UFUNCTION()
       int GetScore();
+
+
+private:
+  TArray<class AEnemy*> Enemies_;
+  int currentTurn_;
+  bool turn_;
 
 protected:
 	// Called when the game starts or when spawned
@@ -56,6 +63,8 @@ private:
 
   float temporalTimer_;
 public:	
+  UFUNCTION()
+  void NextTurn();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

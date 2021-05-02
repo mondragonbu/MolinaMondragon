@@ -56,12 +56,14 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	private:
 		TArray<ADungeonNode*> groundEnablePool_;
 		TArray<ADungeonNode*> groundActivePool_;
+
 		
 	public:
 		UFUNCTION()
 		void GenerateLevel();
-
 		void IterateCave();
+		UFUNCTION()
+		void RestartLevel();
 	protected:
 		virtual void BeginPlay() override;
 	private:

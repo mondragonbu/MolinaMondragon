@@ -35,14 +35,30 @@ void AMyPlayer::BeginPlay()
   SetActorLocation(worldPos);
 
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
+  currentTurn_ = 0;
+  turn_ = true;
   for (int i = 0; i < gamemode->numberEnemy_; i++) {
       GetWorld()->SpawnActor<AEnemy>(gamemode->Enemy_);
   }
+  TArray<AActor*> actors;
+  UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(TEXT("Enemy")), actors);
+ // actors_.Insert(Cast<AActor>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)), 0);
+  for (AActor* actor : actors)
+  {
+      AEnemy* enemy = Cast<AEnemy>(actor);
+      Enemies_.Add(enemy);
+  }
+  UE_LOG(LogTemp, Warning, TEXT(" enemies length: %d"), Enemies_.Num());
+
+
+  gamemode->RestartLevel();
 }
 
 void AMyPlayer::MoveUp()
 {
+  if (!turn_) return;
+  turn_ = false;
+  NextTurn();
   UE_LOG(LogTemp, Warning, TEXT("MOVE UP"));
   GridMovementComponent_->MoveUp();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
@@ -51,6 +67,9 @@ void AMyPlayer::MoveUp()
 
 void AMyPlayer::MoveDown()
 {
+  if (!turn_) return;
+  turn_ = false;
+  NextTurn();
   UE_LOG(LogTemp, Warning, TEXT("MOVE DOWN"));
   GridMovementComponent_->MoveDown();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
@@ -59,6 +78,9 @@ void AMyPlayer::MoveDown()
 
 void AMyPlayer::MoveLeft()
 {
+  if (!turn_) return;
+  turn_ = false;
+  NextTurn();
   UE_LOG(LogTemp, Warning, TEXT("MOVE LEFT"));
   GridMovementComponent_->MoveLeft();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
@@ -67,6 +89,9 @@ void AMyPlayer::MoveLeft()
 
 void AMyPlayer::MoveRight()
 {
+  if(!turn_) return;
+  turn_ = false;
+  NextTurn();
   UE_LOG(LogTemp, Warning, TEXT("MOVE RIGHT"));
   GridMovementComponent_->MoveRight();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
@@ -75,14 +100,27 @@ void AMyPlayer::MoveRight()
 
 void AMyPlayer::ActivePathfindingEnemies()
 {
-    TArray<AActor*> Enemies;
+   /* TArray<AActor*> Enemies;
     UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(TEXT("Enemy")), Enemies);
 
     for (AActor* a : Enemies)
     {
         AEnemy* e = Cast<AEnemy>(a);
         e->ExecuteInternalPathfinding();
-    }
+    }*/
+}
+
+void AMyPlayer::NextTurn()
+{
+  currentTurn_++;
+  if (currentTurn_ == Enemies_.Num() + 1) {
+    currentTurn_ = 0;
+  }
+  if(currentTurn_ == 0)
+    turn_ = true;
+  else {
+    Enemies_[currentTurn_-1]->SetTurn();
+  }
 }
 
 void AMyPlayer::PauseController()
@@ -142,12 +180,17 @@ int AMyPlayer::GetScore()
 void AMyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
   temporalTimer_ += DeltaTime;
-  if (temporalTimer_ >= 1.0f) {
+  /*if (temporalTimer_ >= 1.0f) {
       GetDamage(1);
       AddScore(100);
       temporalTimer_ = 0.0f;
-  }
+  }*/
+
+
+
+
 }
 
 // Called to bind functionality to input

@@ -5,6 +5,7 @@
 #include "Placeables/DungeonNode.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void ADungeonGameMode::BeginPlay() {
@@ -231,6 +232,11 @@ void ADungeonGameMode::IterateCave()
 			else
 				groundActivePool_[i]->SetColor(groundColor1_);
 		}*/
+}
+
+void ADungeonGameMode::RestartLevel()
+{
+		
 }
 
 void ADungeonGameMode::CreatePool()

@@ -7,6 +7,8 @@
 #include "GameModes/DungeonGameMode.h"
 #include "Player/MyPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Enemies/AI/EnemyAIController.h"
+
 
 // Sets default values
 AEnemy::AEnemy()
@@ -67,7 +69,7 @@ void AEnemy::BeginPlay()
   SetActorLocation(worldPos);
   ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   gameMode->grid_[GridMovementComponent_->GridPosition_] = NodeType::Ocupped;
-
+  turn_ = false;
   ExecuteInternalPathfinding();
 }
 
@@ -142,7 +144,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                     enemyLoopRight.fatherPath = pathTmp;
 
                     if (enemyLoopRight.distanceToTheEnd < 1) {
-                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                       // UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
                         loopFinished = true;
                     }
 
@@ -202,7 +204,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                     enemyLoopUp.fatherPath = pathTmp;
 
                     if (enemyLoopUp.distanceToTheEnd < 1) {
-                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        //UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
                         loopFinished = true;
                     }
 
@@ -261,7 +263,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                     enemyLoopLeft.fatherPath = pathTmp;
 
                     if (enemyLoopLeft.distanceToTheEnd < 1) {
-                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        //UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
                         loopFinished = true;
                     }
 
@@ -321,7 +323,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
                     enemyLoopDown.fatherPath = pathTmp;
 
                     if (enemyLoopDown.distanceToTheEnd < 1) {
-                        UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
+                        //UE_LOG(LogTemp, Warning, TEXT("-----FIND PLAYER---%d--"), loopInPath_);
                         loopFinished = true;
                     }
 
@@ -368,7 +370,7 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
         closedList_.Empty();
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
+    //UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
     BuildPath(originPosition);
 }
 
@@ -418,7 +420,7 @@ void AEnemy::BuildPath(int origin)
         movementEnemy_.Add(MovementsEnemy::None);
     }
     
-    UE_LOG(LogTemp, Warning, TEXT("-----BUILD PATH-----"));
+    //UE_LOG(LogTemp, Warning, TEXT("-----BUILD PATH-----"));
 }
 
 void AEnemy::ExecuteMovement()
@@ -461,12 +463,28 @@ void AEnemy::ExecuteMovement()
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-  timer += DeltaTime;
+  /*if (turn_) {
+      turn_ = false;
+      AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
+      player->NextTurn();
+      //ExecuteInternalPathfinding();
+      //ExecuteMovement();
+      //FTimerDelegate TimerDel;
+      //FTimerHandle TimerHandle;
+      //TimerDel.BindUFunction(player, FName("NextTurn"));
+      //GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, 1.0f, false);
+      //player->NextTurn();
+      //UE_LOG(LogTemp, Warning, TEXT("TURN OF : %S"),);
+      GEngine->AddOnScreenDebugMessage(-1, 15.0f , FColor::Yellow, this->GetDebugName(this));
+
+  }*/
+  /*timer += DeltaTime;
   if (timer >= 0.66f) { 
       ExecuteInternalPathfinding();
       ExecuteMovement();
       timer = 0.0f;   
-  }
+  }*/
+
 }
 
 // Called to bind functionality to input
@@ -475,4 +493,13 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+void AEnemy::Attack()
+{
 
+}
+void AEnemy::SetTurn()
+{
+    turn_ = true;
+    AEnemyAIController* controller = Cast<AEnemyAIController>(GetController());
+    controller->SetTurn();
+}

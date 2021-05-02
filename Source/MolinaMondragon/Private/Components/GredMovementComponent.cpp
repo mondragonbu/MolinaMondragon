@@ -32,7 +32,7 @@ FVector UGredMovementComponent::GetWorldPosition()
  
   int Y =  GridPosition_ / GM_->gridSize_.X ;
   int X = GridPosition_- Y * GM_->gridSize_.X;
-  UE_LOG(LogTemp, Warning, TEXT(" Y: %d X: %d"),Y ,X);
+  //UE_LOG(LogTemp, Warning, TEXT(" Y: %d X: %d"),Y ,X);
   return FVector(X*GM_->groundTileWidth_, Y*GM_->groundTileHeight_,0) ;
 }
 

@@ -56,8 +56,12 @@ public:
     void MoveRight();
   UFUNCTION()
     void ExecuteInternalPathfinding();
-
-
+  UFUNCTION()
+    void Attack();
+  UFUNCTION()
+    void SetTurn();
+  UFUNCTION()
+  void ExecuteMovement();
   TArray<FPathInfo> openList_;
   TArray<FPathInfo> closedList_;
   TArray<MovementsEnemy> movementEnemy_;
@@ -68,7 +72,9 @@ protected:
 
   void PathFinding(int actualPosition, int originPosition);
   void BuildPath(int origin);
-  void ExecuteMovement();
+  
+
+
 
   int actualPositionPath;
   int originPositionPath;
@@ -77,6 +83,7 @@ protected:
   float timer;
 
 public:	
+  bool turn_;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
