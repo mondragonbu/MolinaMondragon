@@ -43,6 +43,8 @@ public:
   UFUNCTION()
       int RandomWalkableNode();
   UFUNCTION()
+      int RandomWalkableNodeFromLast();
+  UFUNCTION()
       int ManhattanDistance(int origin, int dest);
   UFUNCTION()
       FVector Index2RowCol(int idx);

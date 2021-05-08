@@ -4,6 +4,7 @@
 #include "Components/GredMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameModes/DungeonGameMode.h"
+#include "Player/MyPlayer.h"
 
 // Sets default values for this component's properties
 UGredMovementComponent::UGredMovementComponent()
@@ -40,28 +41,40 @@ void UGredMovementComponent::MoveUp()
 {
     GM_->grid_[GridPosition_] = NodeType::Ground;
     GridPosition_ -= GM_->gridSize_.X;
-    GM_->grid_[GridPosition_] = NodeType::Ocupped;
+    AMyPlayer* player = Cast<AMyPlayer>(GetOwner());
+    if (player == nullptr) {
+        GM_->grid_[GridPosition_] = NodeType::Ocupped;
+    }  
 }
 
 void UGredMovementComponent::MoveLeft()
 {
     GM_->grid_[GridPosition_] = NodeType::Ground;
   GridPosition_ -= 1;
-  GM_->grid_[GridPosition_] = NodeType::Ocupped;
+  AMyPlayer* player = Cast<AMyPlayer>(GetOwner());
+  if (player == nullptr) {
+      GM_->grid_[GridPosition_] = NodeType::Ocupped;
+  }
 }
 
 void UGredMovementComponent::MoveRight()
 {
     GM_->grid_[GridPosition_] = NodeType::Ground;
   GridPosition_ += 1;
-  GM_->grid_[GridPosition_] = NodeType::Ocupped;
+  AMyPlayer* player = Cast<AMyPlayer>(GetOwner());
+  if (player == nullptr) {
+      GM_->grid_[GridPosition_] = NodeType::Ocupped;
+  }
 }
 
 void UGredMovementComponent::MoveDown()
 {
     GM_->grid_[GridPosition_] = NodeType::Ground;
   GridPosition_ += GM_->gridSize_.X;
-  GM_->grid_[GridPosition_] = NodeType::Ocupped;
+  AMyPlayer* player = Cast<AMyPlayer>(GetOwner());
+  if (player == nullptr) {
+      GM_->grid_[GridPosition_] = NodeType::Ocupped;
+  }
 }
 
 int UGredMovementComponent::RandomWalkableNode()
@@ -76,6 +89,20 @@ int UGredMovementComponent::RandomWalkableNode()
             nodeFind = true;
         }
     }
+    return randomNode;
+}
+
+int UGredMovementComponent::RandomWalkableNodeFromLast()
+{
+    int sizegrid = GM_->gridSize_.X * GM_->gridSize_.Y;
+
+    int randomNode = 0;
+    for (int i = 0; i < sizegrid; i++) {
+        if (grid_[i] == NodeType::Ground) {
+            randomNode = i;
+        }
+    }
+    
     return randomNode;
 }
 

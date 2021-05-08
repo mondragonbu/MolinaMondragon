@@ -5,6 +5,7 @@
 #include "Placeables/DungeonNode.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Math/UnrealMathUtility.h"
+#include "Placeables/Door.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -82,6 +83,11 @@ void ADungeonGameMode::GenerateCave()
 			groundActivePool_[i]->SetColor(groundColor1_);
 	}
 
+}
+
+void ADungeonGameMode::SpawnFinishDoor()
+{
+		DoorFinishInstance_ = GetWorld()->SpawnActor<ADoor>(DoorFinish_);
 }
 
 void ADungeonGameMode::IterateCave()
