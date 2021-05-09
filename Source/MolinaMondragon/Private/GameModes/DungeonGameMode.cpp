@@ -104,7 +104,8 @@ void ADungeonGameMode::DestroyLevel()
 
 void ADungeonGameMode::SpawnFinishDoor()
 {
-		DoorFinishInstance_ = GetWorld()->SpawnActor<ADoor>(DoorFinish_);
+  if(DoorFinishInstance_) DoorFinishInstance_->Destroy();
+	DoorFinishInstance_ = GetWorld()->SpawnActor<ADoor>(DoorFinish_);
 
 }
 
