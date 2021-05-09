@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/AudioComponent.h"
 #include "MyPlayer.generated.h"
 UENUM(BlueprintType)
 enum class  Direction : uint8
@@ -28,8 +29,11 @@ public:
   float health_;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
+
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* DeathSoundCue_;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
-  class UAnimMontage* AttackMontage_;
+      class UAnimMontage* AttackMontage_;
   UFUNCTION()
     void RestartLevel(bool succes);
   UFUNCTION()
@@ -50,6 +54,7 @@ private:
   int currentTurn_;
   bool turn_;
 
+  UAudioComponent* DeathAudioComponent_;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -66,7 +71,7 @@ private:
     void MoveRight();
   UFUNCTION()
     void ActivePathfindingEnemies();
-  
+
   UFUNCTION()
     void CheckFinish();
 
@@ -74,7 +79,7 @@ private:
   int playerScore_;
   Direction direction_;
   float temporalTimer_;
-public:	
+public:
   UFUNCTION()
   void NextTurn();
 	// Called every frame

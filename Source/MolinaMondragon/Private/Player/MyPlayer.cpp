@@ -11,11 +11,10 @@
 #include "Placeables/DungeonNode.h"
 #include "Placeables/Door.h"
 #include "GameModes/DungeonGameInstance.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Sound/SoundCue.h"
 #include "Animation/AnimMontage.h"
 #include "Components/GredMovementComponent.h"
-
-
-
 // Sets default values
 AMyPlayer::AMyPlayer()
 {
@@ -29,6 +28,14 @@ AMyPlayer::AMyPlayer()
   playerHealth_ = 100;
   playerScore_ = 0;
   temporalTimer_ = 0.0f;
+
+  static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCueTest.SoundCueTest'"));
+  if (AudioDeathCueObject.Succeeded()) {
+      DeathSoundCue_ = AudioDeathCueObject.Object;
+
+      DeathAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("DeathAudioComponent_"));
+      DeathAudioComponent_->SetupAttachment(RootComponent);
+  }
 }
 
 // Called when the game starts or when spawned
@@ -60,6 +67,10 @@ void AMyPlayer::BeginPlay()
 
   gamemode->SpawnFinishDoor();
 
+  //SOUNDS
+  if (DeathAudioComponent_ && DeathSoundCue_) {
+      DeathAudioComponent_->SetSound(DeathSoundCue_);
+  }
 
 }
 
@@ -179,6 +190,7 @@ void AMyPlayer::Attack()
 
   }
   UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACK"));
+  DeathAudioComponent_->Play();
   NextTurn();
 }
 
