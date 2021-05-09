@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/AudioComponent.h"
 #include "MyPlayer.generated.h"
 UENUM(BlueprintType)
 enum class  Direction : uint8
@@ -29,6 +30,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
 
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* DeathSoundCue_;
+
   UFUNCTION()
     void RestartLevel(bool succes);
   UFUNCTION()
@@ -49,6 +53,7 @@ private:
   int currentTurn_;
   bool turn_;
 
+  UAudioComponent* DeathAudioComponent_;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
