@@ -6,6 +6,7 @@
 #include "GameFramework/GameMode.h"
 #include "Placeables/DungeonNode.h"
 #include "Enemies/Enemy.h"
+#include "Components/AudioComponent.h"
 #include "DungeonGameMode.generated.h"
 
 /**
@@ -26,6 +27,7 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	GENERATED_BODY()
 
 	public:
+			ADungeonGameMode();
 	UPROPERTY(EditDefaultsOnly, Category="Generation")
 		TSubclassOf<ADungeonNode> Ground1_;
   UPROPERTY(EditDefaultsOnly, Category = "Generation")
@@ -56,13 +58,33 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
   UPROPERTY(EditDefaultsOnly, Category = "Enemy")
       uint8 numberEnemy_ = 1;
 
+	//SOUNDS
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* DeathPlayerSoundCue_;
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* KickPlayerSoundCue_;
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* MonsterDeathSoundCue_;
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* NextLevelSoundCue_;
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* PlayerDamageSoundCue_;
+  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
+      class USoundCue* BackgroundSoundCue_;
+
 
   TArray<NodeType> grid_;
 	private:
 		TArray<ADungeonNode*> groundEnablePool_;
 		TArray<ADungeonNode*> groundActivePool_;
 
-		
+		//SOUND
+		UAudioComponent* DeathPlayerAudioComponent_;
+		UAudioComponent* KickPlayerAudioComponent_;
+		UAudioComponent* MonsterDeathAudioComponent_;
+		UAudioComponent* NextLevelAudioComponent_;
+		UAudioComponent* PlayerDamageAudioComponent_;
+		UAudioComponent* BackgroundAudioComponent_;
 	public:
 		UFUNCTION()
 		void GenerateLevel();
@@ -74,6 +96,9 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
     void GenerateCave();
     UFUNCTION()
     void SpawnFinishDoor();
+		//INDEX = 0->Death Player / 1->Kick Player / 2->Death Monster / 3->Next Level / 4->Player Damage/ 5->Background
+    UFUNCTION()
+    void PlaySound(int index);
 	protected:
 		virtual void BeginPlay() override;
 	private:

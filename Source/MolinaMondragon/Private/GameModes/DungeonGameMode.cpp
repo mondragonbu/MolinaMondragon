@@ -7,7 +7,53 @@
 #include "Math/UnrealMathUtility.h"
 #include "Placeables/Door.h"
 #include "Kismet/GameplayStatics.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Sound/SoundCue.h"
 
+ADungeonGameMode::ADungeonGameMode() {
+    //DEATH PLAYER SOUND
+		static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCueDeathPlayer.SoundCueDeathPlayer'"));
+    if (AudioDeathCueObject.Succeeded()) {
+				DeathPlayerSoundCue_ = AudioDeathCueObject.Object;
+
+				DeathPlayerAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("DeathAudioComponent_"));
+    }
+		//KICK PLAYER SOUND
+    static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject1(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCueKickPlayer.SoundCueKickPlayer'"));
+    if (AudioDeathCueObject1.Succeeded()) {
+				KickPlayerSoundCue_ = AudioDeathCueObject1.Object;
+
+				KickPlayerAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("KickPlayerAudioComponent_"));
+    }
+		//MOSNTER DEATH SOUND
+    static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject2(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCueMonsterDeath.SoundCueMonsterDeath'"));
+    if (AudioDeathCueObject2.Succeeded()) {
+				MonsterDeathSoundCue_ = AudioDeathCueObject2.Object;
+
+				MonsterDeathAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("MonsterDeathAudioComponent_"));
+    }
+		//NEXT LEVEL SOUND
+    static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject3(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCueNextLevel.SoundCueNextLevel'"));
+    if (AudioDeathCueObject3.Succeeded()) {
+				NextLevelSoundCue_ = AudioDeathCueObject3.Object;
+
+				NextLevelAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("NextLevelAudioComponent_"));
+    }
+		//PLAYER DAMAGE SOUND
+    static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject4(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCuePlayerDamage.SoundCuePlayerDamage'"));
+    if (AudioDeathCueObject4.Succeeded()) {
+				PlayerDamageSoundCue_ = AudioDeathCueObject4.Object;
+
+				PlayerDamageAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("PlayerDamageAudioComponent_"));
+    }
+		//BACKGROUND AUDIO SOUND
+    static ConstructorHelpers::FObjectFinder<USoundCue> AudioDeathCueObject5(TEXT("SoundCue'/Game/MolinaMondragon/Sounds/SoundCueBackground.SoundCueBackground'"));
+    if (AudioDeathCueObject5.Succeeded()) {
+				BackgroundSoundCue_ = AudioDeathCueObject5.Object;
+
+				BackgroundAudioComponent_ = CreateDefaultSubobject<UAudioComponent>(TEXT("BackgroundAudioComponent_"));
+    }
+}
 
 void ADungeonGameMode::BeginPlay() {
 
@@ -26,8 +72,25 @@ void ADungeonGameMode::BeginPlay() {
 
 	}
 
-
-
+  if (DeathPlayerAudioComponent_ && DeathPlayerSoundCue_) {
+			DeathPlayerAudioComponent_->SetSound(DeathPlayerSoundCue_);
+  }
+  if (KickPlayerAudioComponent_ && KickPlayerSoundCue_) {
+			KickPlayerAudioComponent_->SetSound(KickPlayerSoundCue_);
+  }
+  if (MonsterDeathAudioComponent_ && MonsterDeathSoundCue_) {
+			MonsterDeathAudioComponent_->SetSound(MonsterDeathSoundCue_);
+  }
+  if (NextLevelAudioComponent_ && NextLevelSoundCue_) {
+			NextLevelAudioComponent_->SetSound(NextLevelSoundCue_);
+  }
+  if (PlayerDamageAudioComponent_ && PlayerDamageSoundCue_) {
+			PlayerDamageAudioComponent_->SetSound(PlayerDamageSoundCue_);
+  }
+  if (BackgroundAudioComponent_ && BackgroundSoundCue_) {
+			BackgroundAudioComponent_->SetSound(BackgroundSoundCue_);
+  }
+	PlaySound(5);
 }
 
 void ADungeonGameMode::GenerateNode(FVector position, FLinearColor color, NodeType type)
@@ -107,6 +170,42 @@ void ADungeonGameMode::SpawnFinishDoor()
   if(DoorFinishInstance_) DoorFinishInstance_->Destroy();
 	DoorFinishInstance_ = GetWorld()->SpawnActor<ADoor>(DoorFinish_);
 
+}
+
+void ADungeonGameMode::PlaySound(int index)
+{
+		switch (index) {
+		case 0: 
+        if (DeathPlayerAudioComponent_ && DeathPlayerSoundCue_) {
+            DeathPlayerAudioComponent_->Play();
+        }
+				break;
+    case 1: 
+				if (KickPlayerAudioComponent_ && KickPlayerSoundCue_) {
+						KickPlayerAudioComponent_->Play();
+				}  
+				break;
+		case 2: 
+        if (MonsterDeathAudioComponent_ && MonsterDeathSoundCue_) {
+            MonsterDeathAudioComponent_->Play();
+        }
+				break;
+		case 3: 
+        if (NextLevelAudioComponent_ && NextLevelSoundCue_) {
+            NextLevelAudioComponent_->Play();
+        }
+				break;
+		case 4: 
+        if (PlayerDamageAudioComponent_ && PlayerDamageSoundCue_) {
+            PlayerDamageAudioComponent_->Play();
+        }
+				break;
+		case 5: 
+        if (BackgroundAudioComponent_ && BackgroundSoundCue_) {
+            BackgroundAudioComponent_->Play();
+        }
+				break;
+		}  
 }
 
 void ADungeonGameMode::IterateCave()

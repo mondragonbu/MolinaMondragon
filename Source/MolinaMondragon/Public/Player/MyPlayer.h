@@ -53,8 +53,6 @@ private:
   TArray<class AEnemy*> Enemies_;
   int currentTurn_;
   bool turn_;
-
-  UAudioComponent* DeathAudioComponent_;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -485,7 +485,7 @@ void AEnemy::Death()
   player->AddScore(10);
   ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   gameMode->grid_[GridMovementComponent_->GridPosition_] = NodeType::Ground;
-  
+  gameMode->PlaySound(2);
   SetActive(false);
 }
 
