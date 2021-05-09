@@ -105,7 +105,7 @@ void ADungeonGameMode::DestroyLevel()
 void ADungeonGameMode::SpawnFinishDoor()
 {
 		DoorFinishInstance_ = GetWorld()->SpawnActor<ADoor>(DoorFinish_);
-//>>>>>>> 225b798d33fe4f6adf5070380751294e7a30211a
+
 }
 
 void ADungeonGameMode::IterateCave()

@@ -58,7 +58,7 @@ void AMyPlayer::BeginPlay()
 
   gamemode->SpawnFinishDoor();
 
-  gamemode->RestartLevel();
+
 }
 
 void AMyPlayer::MoveUp()
@@ -235,6 +235,7 @@ void AMyPlayer::RestartLevel(bool succes)
   }
   //posicionar puerta y player
   GridMovementComponent_->GridPosition_ = GridMovementComponent_->RandomWalkableNode();
+  SetActorLocation(GridMovementComponent_->GetWorldPosition());
 }
 
 void AMyPlayer::PauseController()

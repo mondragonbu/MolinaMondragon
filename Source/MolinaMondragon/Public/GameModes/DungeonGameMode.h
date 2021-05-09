@@ -72,6 +72,8 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 		void IterateCave();
     UFUNCTION()
     void GenerateCave();
+    UFUNCTION()
+    void SpawnFinishDoor();
 	protected:
 		virtual void BeginPlay() override;
 	private:
