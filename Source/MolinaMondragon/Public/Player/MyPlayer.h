@@ -66,6 +66,9 @@ private:
   UFUNCTION()
     void ActivePathfindingEnemies();
   
+  UFUNCTION()
+    void CheckFinish();
+
   int playerHealth_;
   int playerScore_;
   Direction direction_;

@@ -9,6 +9,9 @@
 #include "GameModes/DungeonPlayerController.h"
 #include "UI/IngameHUD.h"
 #include "Placeables/DungeonNode.h"
+#include "Placeables/Door.h"
+#include "GameModes/DungeonGameInstance.h"
+
 
 #include "Components/GredMovementComponent.h"
 // Sets default values
@@ -30,7 +33,7 @@ AMyPlayer::AMyPlayer()
 void AMyPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-  
+
   GridMovementComponent_->GridPosition_ = GridMovementComponent_->RandomWalkableNode();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
@@ -53,7 +56,9 @@ void AMyPlayer::BeginPlay()
   UE_LOG(LogTemp, Warning, TEXT(" enemies length: %d"), Enemies_.Num());
 
 
-  
+  gamemode->SpawnFinishDoor();
+
+  gamemode->RestartLevel();
 }
 
 void AMyPlayer::MoveUp()
@@ -71,6 +76,7 @@ void AMyPlayer::MoveUp()
   GridMovementComponent_->MoveUp();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  CheckFinish();
 }
 
 void AMyPlayer::MoveDown()
@@ -88,6 +94,7 @@ void AMyPlayer::MoveDown()
   GridMovementComponent_->MoveDown();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  CheckFinish();
 }
 
 void AMyPlayer::MoveLeft()
@@ -105,6 +112,7 @@ void AMyPlayer::MoveLeft()
   GridMovementComponent_->MoveLeft();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  CheckFinish();
 }
 
 void AMyPlayer::MoveRight()
@@ -122,6 +130,7 @@ void AMyPlayer::MoveRight()
   GridMovementComponent_->MoveRight();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+  CheckFinish();
 }
 void AMyPlayer::Attack()
 {
@@ -141,7 +150,7 @@ void AMyPlayer::Attack()
     }
     break;
   case Direction::Up:
-   
+
     for (int i = 0; i < Enemies_.Num(); i++)
     {
       if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ - gamemode->gridSize_.X)
@@ -156,7 +165,7 @@ void AMyPlayer::Attack()
     }
     break;
   case Direction::Down:
-    
+
     for (int i = 0; i < Enemies_.Num(); i++)
     {
       if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ + gamemode->gridSize_.X)
@@ -179,6 +188,14 @@ void AMyPlayer::ActivePathfindingEnemies()
         AEnemy* e = Cast<AEnemy>(a);
         e->ExecuteInternalPathfinding();
     }*/
+}
+
+void AMyPlayer::CheckFinish()
+{
+    ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+    if (GridMovementComponent_->GridPosition_ == gamemode->DoorFinishInstance_->GridMovementComponent_->GridPosition_) {
+        UGameplayStatics::OpenLevel(GetWorld(), "Menu");
+    }
 }
 
 void AMyPlayer::NextTurn()
@@ -243,6 +260,10 @@ void AMyPlayer::PauseController()
 void AMyPlayer::GetDamage(int dmg)
 {
     AIngameHUD* hud = Cast<AIngameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
+    UDungeonGameInstance* gminstance = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+    if (gminstance != nullptr) {
+        gminstance->score_ = GetScore();
+    }
     if (hud != nullptr) {
         if (playerHealth_ - dmg > 0) {
             playerHealth_ -= dmg;
@@ -250,8 +271,9 @@ void AMyPlayer::GetDamage(int dmg)
         }
         else {
             //DEATH
+            UGameplayStatics::OpenLevel(GetWorld(), "GameOver");
         }
-    }  
+    }
 }
 
 int AMyPlayer::GetHealth()
@@ -279,15 +301,11 @@ void AMyPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
   temporalTimer_ += DeltaTime;
-  /*if (temporalTimer_ >= 1.0f) {
-      GetDamage(1);
+  if (temporalTimer_ >= 1.0f) {
+      GetDamage(10);
       AddScore(100);
       temporalTimer_ = 0.0f;
-  }*/
-
-
-
-
+  }
 }
 
 // Called to bind functionality to input
@@ -301,4 +319,3 @@ void AMyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
   PlayerInputComponent->BindAction("ATTACK", IE_Pressed, this, &AMyPlayer::Attack);
   PlayerInputComponent->BindAction("PAUSE", IE_Pressed, this, &AMyPlayer::PauseController).bExecuteWhenPaused = true;
 }
-

@@ -9,7 +9,7 @@
 #include "DungeonGameMode.generated.h"
 
 /**
- * 
+ *
  */
 
 UENUM(BlueprintType)
@@ -28,6 +28,11 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	public:
 	UPROPERTY(EditDefaultsOnly, Category="Generation")
 		TSubclassOf<ADungeonNode> Ground1_;
+  UPROPERTY(EditDefaultsOnly, Category = "Generation")
+      TSubclassOf<class ADoor> DoorFinish_;
+
+	class ADoor* DoorFinishInstance_;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Generation")
 		FLinearColor groundColor0_;
 	UPROPERTY(EditDefaultsOnly, Category = "Generation")
@@ -72,6 +77,6 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	private:
 		void CreatePool();
 		void GenerateNode(FVector position, FLinearColor color, NodeType type);
-		
-		
+
+
 };

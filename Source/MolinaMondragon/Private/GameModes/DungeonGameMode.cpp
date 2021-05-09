@@ -5,6 +5,7 @@
 #include "Placeables/DungeonNode.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Math/UnrealMathUtility.h"
+#include "Placeables/Door.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -25,7 +26,7 @@ void ADungeonGameMode::BeginPlay() {
 
 	}
 
-	
+
 
 }
 
@@ -45,7 +46,7 @@ void ADungeonGameMode::GenerateNode(FVector position, FLinearColor color, NodeTy
 	mi = UMaterialInstanceDynamic::Create(genNode->Mesh->GetMaterial(0), this);
 	mi->SetVectorParameterValue(TEXT("Color"), color );
 	genNode->Mesh->SetMaterial(0, mi);*/
-	
+
 }
 
 
@@ -66,17 +67,17 @@ void ADungeonGameMode::GenerateCave()
 				color = groundColor0_;
 				typeNode = NodeType::Wall;
 				grid_.Add(NodeType::Wall);
-			}	
+			}
 			else {
 				color = groundColor1_;
 				typeNode = NodeType::Ground;
 				grid_.Add(NodeType::Ground);
 			}
-				
+
 			GenerateNode(FVector(groundTileWidth_ * i, groundTileHeight_ * j, 0.f), color, typeNode);
 		}
 	}
-	
+
 	for (int i = 0; i < gridSize_.X * gridSize_.Y; i++)
 	{
 		groundActivePool_[i]->type_ = grid_[i];
@@ -88,6 +89,7 @@ void ADungeonGameMode::GenerateCave()
 
 }
 
+
 void ADungeonGameMode::DestroyLevel()
 {
   for (int i = 0; i < gridSize_.X * gridSize_.Y; i++)
@@ -98,7 +100,12 @@ void ADungeonGameMode::DestroyLevel()
     delNode->SetActive(false);
   }
   grid_.Empty();
+}
 
+void ADungeonGameMode::SpawnFinishDoor()
+{
+		DoorFinishInstance_ = GetWorld()->SpawnActor<ADoor>(DoorFinish_);
+//>>>>>>> 225b798d33fe4f6adf5070380751294e7a30211a
 }
 
 void ADungeonGameMode::IterateCave()
@@ -116,7 +123,7 @@ void ADungeonGameMode::IterateCave()
 				if (grid_[selfidx] == NodeType::Wall) {
 					neighbors++;
 				}
-				
+
 				//top left
 				if (iX == 0 || iY == 0) {
 					neighbors++;
@@ -157,7 +164,7 @@ void ADungeonGameMode::IterateCave()
 
 				}
 
-				
+
 				//left
 				if (iX == 0) {
 					//UE_LOG(LogTemp, Warning, TEXT("left"));
@@ -206,7 +213,7 @@ void ADungeonGameMode::IterateCave()
 				}
 
 
-				//down 
+				//down
 				if (iY == gridSize_.Y - 1) {
 					//UE_LOG(LogTemp, Warning, TEXT("down"));
 					neighbors++;
@@ -217,8 +224,8 @@ void ADungeonGameMode::IterateCave()
 					if (grid_[index] == NodeType::Wall)
 						neighbors++;
 				}
-				
-				
+
+
 
 				if (neighbors >= neighborsRule)
 					nextGrid.Add(NodeType::Wall);
@@ -226,7 +233,7 @@ void ADungeonGameMode::IterateCave()
 					nextGrid.Add(NodeType::Ground);
 			}
 		}
-			
+
 		grid_ = nextGrid;
 		//TODO CREATE FUNCTION
 		for (int iY = 0; iY < gridSize_.Y; iY++)
@@ -263,7 +270,7 @@ void ADungeonGameMode::CreatePool()
 		groundEnablePool_.Add(newNode);
 		newNode->SetActive(false);
 	}
-	
+
 }
 
 void ADungeonGameMode::GenerateLevel() {
@@ -284,6 +291,5 @@ void ADungeonGameMode::GenerateLevel() {
 		}
 	}
 
-	
-}
 
+}
