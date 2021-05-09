@@ -30,8 +30,6 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
 
-  UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AUDIO")
-      class USoundCue* DeathSoundCue_;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
       class UAnimMontage* AttackMontage_;
   UFUNCTION()
