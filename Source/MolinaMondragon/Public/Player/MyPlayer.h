@@ -28,7 +28,8 @@ public:
   float health_;
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
-
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+  class UAnimMontage* AttackMontage_;
   UFUNCTION()
     void RestartLevel(bool succes);
   UFUNCTION()

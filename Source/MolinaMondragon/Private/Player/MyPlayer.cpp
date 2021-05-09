@@ -11,9 +11,11 @@
 #include "Placeables/DungeonNode.h"
 #include "Placeables/Door.h"
 #include "GameModes/DungeonGameInstance.h"
-
-
+#include "Animation/AnimMontage.h"
 #include "Components/GredMovementComponent.h"
+
+
+
 // Sets default values
 AMyPlayer::AMyPlayer()
 {
@@ -135,7 +137,9 @@ void AMyPlayer::MoveRight()
 void AMyPlayer::Attack()
 {
   if(!turn_) return;
-  RestartLevel(true);
+  //RestartLevel(true);
+  Mesh_->GetAnimInstance()->Montage_Play(AttackMontage_);
+ // ->play
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   switch (direction_)
   {
