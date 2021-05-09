@@ -18,13 +18,13 @@ public:
 	UGredMovementComponent();
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   int GridPosition_;
-  
+  TArray<NodeType> grid_;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
   
 private:
-   TArray<NodeType> grid_;
+  
    class ADungeonGameMode* GM_;
    
 public:	

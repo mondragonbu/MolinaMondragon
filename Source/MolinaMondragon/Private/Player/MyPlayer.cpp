@@ -230,10 +230,12 @@ void AMyPlayer::RestartLevel(bool succes)
   for (int i = 0; i < Enemies_.Num(); i++)
   {
     Enemies_[i]->SetActive(true);
+    Enemies_[i]->GridMovementComponent_->grid_ = gamemode->grid_;
     Enemies_[i]->GridMovementComponent_->GridPosition_ = Enemies_[i]->GridMovementComponent_->RandomWalkableNode();
     Enemies_[i]->SetActorLocation(Enemies_[i]->GridMovementComponent_->GetWorldPosition());
   }
   //posicionar puerta y player
+  GridMovementComponent_->grid_ = gamemode->grid_;
   GridMovementComponent_->GridPosition_ = GridMovementComponent_->RandomWalkableNode();
   SetActorLocation(GridMovementComponent_->GetWorldPosition());
 
@@ -303,12 +305,12 @@ void AMyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-  temporalTimer_ += DeltaTime;
+ /* temporalTimer_ += DeltaTime;
   if (temporalTimer_ >= 1.0f) {
       GetDamage(10);
       AddScore(100);
       temporalTimer_ = 0.0f;
-  }
+  }*/
 }
 
 // Called to bind functionality to input

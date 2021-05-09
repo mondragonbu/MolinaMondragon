@@ -492,6 +492,7 @@ void AEnemy::Death()
 void AEnemy::SetActive(bool active)
 {
   active_ = active;
+  
   Mesh_->SetHiddenInGame(!active);
   Mesh_->SetVisibility(active);
 
