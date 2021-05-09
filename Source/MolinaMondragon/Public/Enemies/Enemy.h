@@ -96,6 +96,12 @@ public:
   int health_;
   bool attackRange;
   int max_healt_ = 100.0f;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    class UAnimMontage* AttackMontage_;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    class UAnimMontage* DeathMontage_;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    class UAnimMontage* TakeDMGMontage_;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

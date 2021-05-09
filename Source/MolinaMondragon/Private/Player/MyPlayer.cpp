@@ -178,6 +178,7 @@ void AMyPlayer::Attack()
   }
   UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACK"));
   gamemode->PlaySound(1);
+  
   NextTurn();
 }
 
@@ -281,8 +282,10 @@ void AMyPlayer::GetDamage(int dmg)
         if (playerHealth_ - dmg > 0) {
             playerHealth_ -= dmg;
             hud->SetHealthPlayer(playerHealth_);
+            Mesh_->GetAnimInstance()->Montage_Play(TakeDMGMontage_);
         }
         else {
+          Mesh_->GetAnimInstance()->Montage_Play(DeathMontage_);
             //DEATH
             gamemode->PlaySound(0);
             UGameplayStatics::OpenLevel(GetWorld(), "GameOver");

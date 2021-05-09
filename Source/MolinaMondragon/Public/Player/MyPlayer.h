@@ -32,6 +32,10 @@ public:
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
       class UAnimMontage* AttackMontage_;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    class UAnimMontage* DeathMontage_;
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+    class UAnimMontage* TakeDMGMontage_;
   UFUNCTION()
     void RestartLevel(bool succes);
   UFUNCTION()

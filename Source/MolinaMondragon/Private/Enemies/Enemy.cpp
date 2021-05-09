@@ -8,7 +8,7 @@
 #include "Player/MyPlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "Enemies/AI/EnemyAIController.h"
-
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -486,6 +486,7 @@ void AEnemy::Death()
   ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   gameMode->grid_[GridMovementComponent_->GridPosition_] = NodeType::Ground;
   gameMode->PlaySound(2);
+  Mesh_->GetAnimInstance()->Montage_Play(DeathMontage_);
   SetActive(false);
 }
 
@@ -504,6 +505,8 @@ void AEnemy::GetDamage(float damage)
   health_-= damage;
   if(health_ <= 0)
     Death();
+  else
+    Mesh_->GetAnimInstance()->Montage_Play(TakeDMGMontage_);
 }
 
 // Called every frame
@@ -544,6 +547,7 @@ void AEnemy::Attack()
 {
   AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
   player->GetDamage(5);
+  Mesh_->GetAnimInstance()->Montage_Play(AttackMontage_);
 }
 void AEnemy::SetTurn()
 {
