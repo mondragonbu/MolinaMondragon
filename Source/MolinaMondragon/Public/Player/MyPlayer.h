@@ -5,7 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "MyPlayer.generated.h"
-
+UENUM(BlueprintType)
+enum class  Direction : uint8
+{
+  None     UMETA(DisplayName = "None"),
+  Right      UMETA(DisplayName = "Right"),
+  Up      UMETA(DisplayName = "Up"),
+  Left      UMETA(DisplayName = "Left"),
+  Down      UMETA(DisplayName = "Down"),
+};
 UCLASS()
 class MOLINAMONDRAGON_API AMyPlayer : public APawn
 {
@@ -21,20 +29,20 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
   class UGredMovementComponent* GridMovementComponent_;
 
-
   UFUNCTION()
-      void PauseController();
-
+    void RestartLevel(bool succes);
   UFUNCTION()
-      void GetDamage(int dmg);
+    void PauseController();
   UFUNCTION()
-      int GetHealth();
-
+    void GetDamage(int dmg);
   UFUNCTION()
-      void AddScore(int score);
+    int GetHealth();
   UFUNCTION()
-      int GetScore();
-
+    void AddScore(int score);
+  UFUNCTION()
+    int GetScore();
+  UFUNCTION()
+    void Attack();
 
 private:
   TArray<class AEnemy*> Enemies_;
@@ -60,7 +68,7 @@ private:
   
   int playerHealth_;
   int playerScore_;
-
+  Direction direction_;
   float temporalTimer_;
 public:	
   UFUNCTION()

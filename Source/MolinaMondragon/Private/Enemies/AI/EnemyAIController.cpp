@@ -47,7 +47,6 @@ UBlackboardComponent* AEnemyAIController::get_blackboard() const
 void AEnemyAIController::SetTurn()
 {
 		if (blackboard) {
-				UE_LOG(LogTemp, Warning, TEXT("yes blackboard"));
 				blackboard->SetValueAsBool(TEXT("Turn"), true);
 		}
 		else

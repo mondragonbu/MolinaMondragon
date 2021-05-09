@@ -25,6 +25,10 @@ AEnemy::AEnemy()
 void AEnemy::MoveUp()
 {
   GridMovementComponent_->MoveUp();
+  direction_ = MovementsEnemy::Up;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 0.0f;
+  SetActorRotation(rot);
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
 }
@@ -32,6 +36,10 @@ void AEnemy::MoveUp()
 void AEnemy::MoveDown()
 {
   GridMovementComponent_->MoveDown();
+  direction_ = MovementsEnemy::Down;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 180.0f;
+  SetActorRotation(rot);
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
 }
@@ -39,6 +47,10 @@ void AEnemy::MoveDown()
 void AEnemy::MoveLeft()
 {
   GridMovementComponent_->MoveLeft();
+  direction_ = MovementsEnemy::Left;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 270.0f;
+  SetActorRotation(rot);
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
 }
@@ -46,6 +58,10 @@ void AEnemy::MoveLeft()
 void AEnemy::MoveRight()
 {
   GridMovementComponent_->MoveRight();
+  direction_ = MovementsEnemy::Right;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 90.0f;
+  SetActorRotation(rot);
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
 }
@@ -372,6 +388,10 @@ void AEnemy::PathFinding(int actualPosition, int originPosition)
 
     //UE_LOG(LogTemp, Warning, TEXT("-----PATHFINDING-----"));
     BuildPath(originPosition);
+    if(movementEnemy_.Num()==1)
+      attackRange = true;
+    else
+      attackRange = false;
 }
 
 void AEnemy::BuildPath(int origin)
@@ -459,6 +479,32 @@ void AEnemy::ExecuteMovement()
     }
 }
 
+void AEnemy::Death()
+{
+  AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
+  player->AddScore(10);
+  ADungeonGameMode* gameMode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  gameMode->grid_[GridMovementComponent_->GridPosition_] = NodeType::Ground;
+  
+  SetActive(false);
+}
+
+void AEnemy::SetActive(bool active)
+{
+  active_ = active;
+  Mesh_->SetHiddenInGame(!active);
+  Mesh_->SetVisibility(active);
+
+}
+
+void AEnemy::GetDamage(float damage)
+{
+  if(!active_)return;
+  health_-= damage;
+  if(health_ <= 0)
+    Death();
+}
+
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
@@ -495,7 +541,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 void AEnemy::Attack()
 {
-
+  AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
+  player->GetDamage(5);
 }
 void AEnemy::SetTurn()
 {

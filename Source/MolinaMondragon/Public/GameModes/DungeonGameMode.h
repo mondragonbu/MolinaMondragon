@@ -61,14 +61,17 @@ class MOLINAMONDRAGON_API ADungeonGameMode : public AGameMode
 	public:
 		UFUNCTION()
 		void GenerateLevel();
+    UFUNCTION()
+    void DestroyLevel();
+    UFUNCTION()
 		void IterateCave();
-		UFUNCTION()
-		void RestartLevel();
+    UFUNCTION()
+    void GenerateCave();
 	protected:
 		virtual void BeginPlay() override;
 	private:
 		void CreatePool();
 		void GenerateNode(FVector position, FLinearColor color, NodeType type);
-		void GenerateCave();
+		
 		
 };

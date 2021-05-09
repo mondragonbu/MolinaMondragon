@@ -8,6 +8,7 @@
 #include "GameModes/DungeonGameMode.h"
 #include "GameModes/DungeonPlayerController.h"
 #include "UI/IngameHUD.h"
+#include "Placeables/DungeonNode.h"
 
 #include "Components/GredMovementComponent.h"
 // Sets default values
@@ -46,20 +47,27 @@ void AMyPlayer::BeginPlay()
   for (AActor* actor : actors)
   {
       AEnemy* enemy = Cast<AEnemy>(actor);
+      enemy->active_ = true;
       Enemies_.Add(enemy);
   }
   UE_LOG(LogTemp, Warning, TEXT(" enemies length: %d"), Enemies_.Num());
 
 
-  gamemode->RestartLevel();
+  
 }
 
 void AMyPlayer::MoveUp()
 {
   if (!turn_) return;
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  if (gamemode->grid_[GridMovementComponent_->GridPosition_ - gamemode->gridSize_.X] == NodeType::Wall) return;
+  direction_ = Direction::Up;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 0.0f;
+  SetActorRotation(rot);
   turn_ = false;
   NextTurn();
-  UE_LOG(LogTemp, Warning, TEXT("MOVE UP"));
+  //UE_LOG(LogTemp, Warning, TEXT("MOVE UP"));
   GridMovementComponent_->MoveUp();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
@@ -68,9 +76,15 @@ void AMyPlayer::MoveUp()
 void AMyPlayer::MoveDown()
 {
   if (!turn_) return;
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  if(gamemode->grid_[GridMovementComponent_->GridPosition_ + gamemode->gridSize_.X] == NodeType::Wall) return;
+  direction_ = Direction::Down;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 180.0f;
+  SetActorRotation(rot);
   turn_ = false;
   NextTurn();
-  UE_LOG(LogTemp, Warning, TEXT("MOVE DOWN"));
+  //UE_LOG(LogTemp, Warning, TEXT("MOVE DOWN"));
   GridMovementComponent_->MoveDown();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
@@ -79,9 +93,15 @@ void AMyPlayer::MoveDown()
 void AMyPlayer::MoveLeft()
 {
   if (!turn_) return;
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  if (gamemode->grid_[GridMovementComponent_->GridPosition_ -1] == NodeType::Wall) return;
+  direction_ = Direction::Left;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 270.0f;
+  SetActorRotation(rot);
   turn_ = false;
   NextTurn();
-  UE_LOG(LogTemp, Warning, TEXT("MOVE LEFT"));
+  //UE_LOG(LogTemp, Warning, TEXT("MOVE LEFT"));
   GridMovementComponent_->MoveLeft();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
@@ -90,12 +110,63 @@ void AMyPlayer::MoveLeft()
 void AMyPlayer::MoveRight()
 {
   if(!turn_) return;
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  if (gamemode->grid_[GridMovementComponent_->GridPosition_ +1] == NodeType::Wall) return;
+  direction_ = Direction::Right;
+  FRotator rot = GetActorRotation();
+  rot.Yaw = 90.0f;
+  SetActorRotation(rot);
   turn_ = false;
   NextTurn();
-  UE_LOG(LogTemp, Warning, TEXT("MOVE RIGHT"));
+  //UE_LOG(LogTemp, Warning, TEXT("MOVE RIGHT"));
   GridMovementComponent_->MoveRight();
   FVector worldPos = GridMovementComponent_->GetWorldPosition();
   SetActorLocation(worldPos);
+}
+void AMyPlayer::Attack()
+{
+  if(!turn_) return;
+  RestartLevel(true);
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  switch (direction_)
+  {
+  case Direction::None:
+    break;
+  case Direction::Right:
+
+    for (int i = 0; i < Enemies_.Num(); i++)
+    {
+      if(Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ + 1)
+        Enemies_[i]->health_--;
+    }
+    break;
+  case Direction::Up:
+   
+    for (int i = 0; i < Enemies_.Num(); i++)
+    {
+      if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ - gamemode->gridSize_.X)
+        Enemies_[i]->health_--;
+    }
+    break;
+  case Direction::Left:
+    for (int i = 0; i < Enemies_.Num(); i++)
+    {
+      if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ - 1)
+        Enemies_[i]->health_--;
+    }
+    break;
+  case Direction::Down:
+    
+    for (int i = 0; i < Enemies_.Num(); i++)
+    {
+      if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ + gamemode->gridSize_.X)
+        Enemies_[i]->health_--;
+    }
+    break;
+
+  }
+  UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACK"));
+  NextTurn();
 }
 
 void AMyPlayer::ActivePathfindingEnemies()
@@ -119,8 +190,34 @@ void AMyPlayer::NextTurn()
   if(currentTurn_ == 0)
     turn_ = true;
   else {
-    Enemies_[currentTurn_-1]->SetTurn();
+    if (Enemies_[currentTurn_ - 1]->active_)
+      Enemies_[currentTurn_-1]->SetTurn();
+    else
+      NextTurn();
   }
+}
+
+
+
+void AMyPlayer::RestartLevel(bool succes)
+{
+  //cueva nueva e iterar
+  ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+  gamemode->DestroyLevel();
+
+  gamemode->GenerateCave();
+  for (int i = 0; i < gamemode->iterations_; i++) {
+    gamemode->IterateCave();
+  }
+  //activar enemigos y posicinarlos
+  for (int i = 0; i < Enemies_.Num(); i++)
+  {
+    Enemies_[i]->SetActive(true);
+    Enemies_[i]->GridMovementComponent_->GridPosition_ = Enemies_[i]->GridMovementComponent_->RandomWalkableNode();
+    Enemies_[i]->SetActorLocation(Enemies_[i]->GridMovementComponent_->GetWorldPosition());
+  }
+  //posicionar puerta y player
+  GridMovementComponent_->GridPosition_ = GridMovementComponent_->RandomWalkableNode();
 }
 
 void AMyPlayer::PauseController()
@@ -201,6 +298,7 @@ void AMyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
   PlayerInputComponent->BindAction("DOWN", IE_Pressed, this, &AMyPlayer::MoveDown);
   PlayerInputComponent->BindAction("LEFT", IE_Pressed, this, &AMyPlayer::MoveLeft);
   PlayerInputComponent->BindAction("RIGHT", IE_Pressed, this, &AMyPlayer::MoveRight);
+  PlayerInputComponent->BindAction("ATTACK", IE_Pressed, this, &AMyPlayer::Attack);
   PlayerInputComponent->BindAction("PAUSE", IE_Pressed, this, &AMyPlayer::PauseController).bExecuteWhenPaused = true;
 }
 

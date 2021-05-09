@@ -61,10 +61,17 @@ public:
   UFUNCTION()
     void SetTurn();
   UFUNCTION()
-  void ExecuteMovement();
+    void ExecuteMovement();
+  UFUNCTION()
+    void Death();
+  UFUNCTION()
+    void SetActive(bool active);
+  UFUNCTION()
+    void GetDamage(float damage);
   TArray<FPathInfo> openList_;
   TArray<FPathInfo> closedList_;
   TArray<MovementsEnemy> movementEnemy_;
+  
   
 protected:
 	// Called when the game starts or when spawned
@@ -83,7 +90,12 @@ protected:
   float timer;
 
 public:	
+  MovementsEnemy direction_;
   bool turn_;
+  bool active_;
+  int health_;
+  bool attackRange;
+  int max_healt_ = 100.0f;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

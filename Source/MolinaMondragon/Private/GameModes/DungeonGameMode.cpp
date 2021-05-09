@@ -18,13 +18,14 @@ void ADungeonGameMode::BeginPlay() {
 		break;
 	case GenerationType::Cave:
 		GenerateCave();
+    for (int i = 0; i < iterations_; i++) {
+      IterateCave();
+    }
 		break;
 
 	}
 
-	for (int i = 0; i < iterations_; i++) {
-			IterateCave();
-	}
+	
 
 }
 
@@ -46,6 +47,9 @@ void ADungeonGameMode::GenerateNode(FVector position, FLinearColor color, NodeTy
 	genNode->Mesh->SetMaterial(0, mi);*/
 	
 }
+
+
+
 void ADungeonGameMode::GenerateCave()
 {
 		//FMath::RandInit(69);
@@ -72,7 +76,7 @@ void ADungeonGameMode::GenerateCave()
 			GenerateNode(FVector(groundTileWidth_ * i, groundTileHeight_ * j, 0.f), color, typeNode);
 		}
 	}
-	//TODO CREATE FUNCTION
+	
 	for (int i = 0; i < gridSize_.X * gridSize_.Y; i++)
 	{
 		groundActivePool_[i]->type_ = grid_[i];
@@ -81,6 +85,19 @@ void ADungeonGameMode::GenerateCave()
 		else
 			groundActivePool_[i]->SetColor(groundColor1_);
 	}
+
+}
+
+void ADungeonGameMode::DestroyLevel()
+{
+  for (int i = 0; i < gridSize_.X * gridSize_.Y; i++)
+  {
+    ADungeonNode* delNode = groundActivePool_[0];
+    groundActivePool_.Remove(delNode);
+    groundEnablePool_.Add(delNode);
+    delNode->SetActive(false);
+  }
+  grid_.Empty();
 
 }
 
@@ -234,10 +251,7 @@ void ADungeonGameMode::IterateCave()
 		}*/
 }
 
-void ADungeonGameMode::RestartLevel()
-{
-		
-}
+
 
 void ADungeonGameMode::CreatePool()
 {
@@ -248,7 +262,6 @@ void ADungeonGameMode::CreatePool()
 		ADungeonNode* newNode = GetWorld()->SpawnActor<ADungeonNode>(Ground1_);
 		groundEnablePool_.Add(newNode);
 		newNode->SetActive(false);
-		
 	}
 	
 }
