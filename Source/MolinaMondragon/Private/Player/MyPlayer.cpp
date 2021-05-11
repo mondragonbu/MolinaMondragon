@@ -164,44 +164,44 @@ void AMyPlayer::Attack()
   Mesh_->GetAnimInstance()->Montage_Play(AttackMontage_);
  // ->play
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-  switch (direction_)
-  {
-  case Direction::None:
+  //switch (direction_)
+ // {
+ // case Direction::None:
     direction_ = Direction::Down;
-    break;
-  case Direction::Right:
+  //  break;
+ // case Direction::Right:
 
     for (int i = 0; i < Enemies_.Num(); i++)
     {
       if(Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ + 1)
         Enemies_[i]->health_--;
     }
-    break;
-  case Direction::Up:
+  //  break;
+ // case Direction::Up:
 
     for (int i = 0; i < Enemies_.Num(); i++)
     {
       if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ - gamemode->gridSize_.X)
         Enemies_[i]->health_--;
     }
-    break;
-  case Direction::Left:
+ //   break;
+ // case Direction::Left:
     for (int i = 0; i < Enemies_.Num(); i++)
     {
       if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ - 1)
         Enemies_[i]->health_--;
     }
-    break;
-  case Direction::Down:
+  //  break;
+  //case Direction::Down:
 
     for (int i = 0; i < Enemies_.Num(); i++)
     {
       if (Enemies_[i]->GridMovementComponent_->GridPosition_ == GridMovementComponent_->GridPosition_ + gamemode->gridSize_.X)
         Enemies_[i]->health_--;
     }
-    break;
+  //  break;
 
-  }
+ // }
   UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACK"));
   gamemode->PlaySound(1);
   
@@ -225,7 +225,8 @@ void AMyPlayer::CheckFinish()
     ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     if (GridMovementComponent_->GridPosition_ == gamemode->DoorFinishInstance_->GridMovementComponent_->GridPosition_) {
         gamemode->PlaySound(3);
-        UGameplayStatics::OpenLevel(GetWorld(), "Menu");
+       // UGameplayStatics::OpenLevel(GetWorld(), "Menu");
+       RestartLevel(true);
     }
 }
 
