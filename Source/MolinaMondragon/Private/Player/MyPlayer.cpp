@@ -64,11 +64,17 @@ void AMyPlayer::BeginPlay()
 void AMyPlayer::MoveUp()
 {
   if (!turn_) return;
+  if (direction_ != Direction::Up) {
+    direction_ = Direction::Up;
+    FRotator rot = GetActorRotation();
+    rot.Yaw = 180.0f;
+    SetActorRotation(rot);
+  }
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   if (gamemode->grid_[GridMovementComponent_->GridPosition_ - gamemode->gridSize_.X] == NodeType::Wall) return;
   direction_ = Direction::Up;
   FRotator rot = GetActorRotation();
-  rot.Yaw = 0.0f;
+  rot.Yaw = 180.0f;
   SetActorRotation(rot);
   turn_ = false;
   NextTurn();
@@ -82,11 +88,17 @@ void AMyPlayer::MoveUp()
 void AMyPlayer::MoveDown()
 {
   if (!turn_) return;
+  if (direction_ != Direction::Down) {
+    direction_ = Direction::Down;
+    FRotator rot = GetActorRotation();
+    rot.Yaw = 0.0f;
+    SetActorRotation(rot);
+  }
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   if(gamemode->grid_[GridMovementComponent_->GridPosition_ + gamemode->gridSize_.X] == NodeType::Wall) return;
   direction_ = Direction::Down;
   FRotator rot = GetActorRotation();
-  rot.Yaw = 180.0f;
+  rot.Yaw = 0.0f;
   SetActorRotation(rot);
   turn_ = false;
   NextTurn();
@@ -100,11 +112,17 @@ void AMyPlayer::MoveDown()
 void AMyPlayer::MoveLeft()
 {
   if (!turn_) return;
+  if (direction_ != Direction::Left) {
+    direction_ = Direction::Left;
+    FRotator rot = GetActorRotation();
+    rot.Yaw = 90.0f;
+    SetActorRotation(rot);
+  }
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   if (gamemode->grid_[GridMovementComponent_->GridPosition_ -1] == NodeType::Wall) return;
   direction_ = Direction::Left;
   FRotator rot = GetActorRotation();
-  rot.Yaw = 270.0f;
+  rot.Yaw = 90.0f;
   SetActorRotation(rot);
   turn_ = false;
   NextTurn();
@@ -118,11 +136,18 @@ void AMyPlayer::MoveLeft()
 void AMyPlayer::MoveRight()
 {
   if(!turn_) return;
+  if (direction_ != Direction::Right) {
+    direction_ = Direction::Right;
+    FRotator rot = GetActorRotation();
+    rot.Yaw = 270.0f;
+    SetActorRotation(rot);
+    NextTurn();
+  }
   ADungeonGameMode* gamemode = Cast<ADungeonGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
   if (gamemode->grid_[GridMovementComponent_->GridPosition_ +1] == NodeType::Wall) return;
   direction_ = Direction::Right;
   FRotator rot = GetActorRotation();
-  rot.Yaw = 90.0f;
+  rot.Yaw = 270.0f;
   SetActorRotation(rot);
   turn_ = false;
   NextTurn();
@@ -142,6 +167,7 @@ void AMyPlayer::Attack()
   switch (direction_)
   {
   case Direction::None:
+    direction_ = Direction::Down;
     break;
   case Direction::Right:
 
@@ -235,6 +261,8 @@ void AMyPlayer::RestartLevel(bool succes)
   for (int i = 0; i < Enemies_.Num(); i++)
   {
     Enemies_[i]->SetActive(true);
+    Enemies_[i]->max_health_++;
+    Enemies_[i]->health_ = Enemies_[i]->max_health_;
     Enemies_[i]->GridMovementComponent_->grid_ = gamemode->grid_;
     Enemies_[i]->GridMovementComponent_->GridPosition_ = Enemies_[i]->GridMovementComponent_->RandomWalkableNode();
     Enemies_[i]->SetActorLocation(Enemies_[i]->GridMovementComponent_->GetWorldPosition());

@@ -546,7 +546,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AEnemy::Attack()
 {
   AMyPlayer* player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
-  player->GetDamage(5);
+  player->GetDamage(attackDamage_);
   Mesh_->GetAnimInstance()->Montage_Play(AttackMontage_);
 }
 void AEnemy::SetTurn()
